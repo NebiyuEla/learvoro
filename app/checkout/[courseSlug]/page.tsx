@@ -1,11 +1,13 @@
 import { LockKeyhole } from 'lucide-react';
 import { getChatGPTUser, chatGPTSignInPath } from '@/app/chatgpt-auth';
 import { Logo } from '@/components/site-header';
+import { CheckoutDetailsForm } from '@/components/checkout-details-form';
 import { course } from '@/lib/course-data';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Secure checkout', robots: { index: false } };
 export default async function Checkout() {
   const user = await getChatGPTUser();
+  const priceLabel = new Intl.NumberFormat('en-US', { style: 'currency', currency: course.currency }).format(course.price / 100);
   if (!user)
     return (
       <main className="grid min-h-screen place-items-center px-5">
@@ -37,37 +39,14 @@ export default async function Checkout() {
           </span>
         </div>
       </header>
-      <main className="mx-auto grid max-w-[1050px] gap-10 px-5 py-10 md:grid-cols-[1fr_360px]">
+      <main className="mx-auto max-w-[1080px] px-5 py-10">
+        <div className="mb-10 grid grid-cols-3 text-center text-sm"><div className="border-b-2 border-[#0757B2] pb-3 font-semibold text-[#0757B2]">1&nbsp; Payment</div><div className="border-b pb-3 text-[#6a777a]">2&nbsp; Review</div><div className="border-b pb-3 text-[#6a777a]">3&nbsp; Complete</div></div>
+        <div className="grid gap-10 md:grid-cols-[1fr_360px]">
         <div>
           <h1 className="font-heading text-3xl font-bold">
             Complete your purchase
           </h1>
-          <section className="mt-8 rounded-xl border bg-white p-6">
-            <h2 className="font-heading text-lg font-bold">
-              Contact information
-            </h2>
-            <p className="mt-3 rounded-lg bg-[#f3f7f6] p-4 text-sm">
-              {user.email}
-            </p>
-            <h2 className="mt-8 font-heading text-lg font-bold">
-              Payment information
-            </h2>
-            <div className="mt-3 rounded-lg border border-dashed p-6 text-center">
-              <LockKeyhole className="mx-auto text-[#0870C9]" />
-              <p className="mt-3 font-semibold">Stripe secure payment</p>
-              <p className="mt-2 text-sm leading-6 text-[#5d696c]">
-                Connect your Stripe test keys to load the PCI-compliant Payment
-                Element. Learvoro never receives or stores your full card
-                number or security code.
-              </p>
-            </div>
-            <button
-              disabled
-              className="mt-6 w-full rounded-lg bg-[#0757B2] p-3.5 font-semibold text-white disabled:opacity-50"
-            >
-              Pay $19.00
-            </button>
-          </section>
+          <CheckoutDetailsForm courseSlug={course.slug} email={user.email} fullName={user.fullName ?? ''} priceLabel={priceLabel} />
         </div>
         <aside>
           <div className="rounded-xl border bg-white p-6">
@@ -79,15 +58,16 @@ export default async function Checkout() {
             <dl className="mt-6 space-y-3 border-t pt-5 text-sm">
               <div className="flex justify-between">
                 <dt>Course</dt>
-                <dd>$19.00</dd>
+                <dd>{priceLabel}</dd>
               </div>
               <div className="flex justify-between border-t pt-4 text-base font-bold">
                 <dt>Total</dt>
-                <dd>USD $19.00</dd>
+                <dd>{course.currency} {priceLabel}</dd>
               </div>
             </dl>
           </div>
         </aside>
+        </div>
       </main>
     </>
   );
