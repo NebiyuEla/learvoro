@@ -1,0 +1,2 @@
+import { query } from '@/lib/db';
+export async function GET(){try{await query('SELECT 1');return Response.json({status:'ok',database:'connected',authentication:Boolean(process.env.AUTH_SECRET)},{status:process.env.AUTH_SECRET?200:503})}catch(error){return Response.json({status:'error',database:'unavailable',authentication:Boolean(process.env.AUTH_SECRET),detail:error instanceof Error&&error.message.includes('DATABASE_URL')?'DATABASE_URL is missing':'Database connection failed'},{status:503})}}
