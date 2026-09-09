@@ -1,5 +1,5 @@
+/* oxlint-disable next/no-html-link-for-pages */
 /* oxlint-disable jsx-a11y/anchor-is-valid */
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { env } from 'cloudflare:workers';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
@@ -15,9 +15,9 @@ export default async function Admin() {
     <div className="min-h-screen bg-[#f6f8f8]">
       <header className="border-b bg-white">
         <div className="flex h-16 items-center px-6">
-          <Link href="/">
+          <a href="/">
             <Logo />
-          </Link>
+          </a>
           <span className="ml-4 rounded bg-[#E7F8F3] px-2 py-1 text-xs font-semibold text-[#0757B2]">
             Admin
           </span>

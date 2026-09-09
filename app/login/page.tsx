@@ -1,3 +1,4 @@
+/* oxlint-disable next/no-html-link-for-pages */
 import { chatGPTSignInPath } from '@/app/chatgpt-auth'; import { Logo } from '@/components/site-header';
 export const metadata={title:'Log in',robots:{index:false}};
 export default function Login(){return <main className="grid min-h-screen place-items-center bg-[#f4f8f7] px-5"><div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-sm"><Logo/><h1 className="mt-10 font-heading text-3xl font-bold">Welcome back</h1><p className="mt-2 text-[#5d696c]">Log in to continue your courses.</p><a href={chatGPTSignInPath('/my-learning')} target="_top" className="mt-8 block rounded-lg bg-[#0757B2] px-4 py-3 text-center font-semibold text-white">Continue securely</a><p className="mt-5 text-center text-xs leading-5 text-[#697679]">Authentication is handled securely by the Learvoro hosting identity service.</p></div></main>}
