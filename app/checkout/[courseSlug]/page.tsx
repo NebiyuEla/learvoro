@@ -20,7 +20,7 @@ export default async function Checkout() {
           <a
             href={chatGPTSignInPath(`/checkout/${course.slug}`)}
             target="_top"
-            className="mt-6 block rounded-lg bg-[#005a70] p-3 text-center font-semibold text-white"
+            className="mt-6 block rounded-lg bg-[#0757B2] p-3 text-center font-semibold text-white"
           >
             Sign in
           </a>
@@ -53,17 +53,17 @@ export default async function Checkout() {
               Payment information
             </h2>
             <div className="mt-3 rounded-lg border border-dashed p-6 text-center">
-              <LockKeyhole className="mx-auto text-[#007a9f]" />
+              <LockKeyhole className="mx-auto text-[#0870C9]" />
               <p className="mt-3 font-semibold">Stripe secure payment</p>
               <p className="mt-2 text-sm leading-6 text-[#5d696c]">
                 Connect your Stripe test keys to load the PCI-compliant Payment
-                Element. Claremint never receives or stores your full card
+                Element. Learvoro never receives or stores your full card
                 number or security code.
               </p>
             </div>
             <button
               disabled
-              className="mt-6 w-full rounded-lg bg-[#005a70] p-3.5 font-semibold text-white disabled:opacity-50"
+              className="mt-6 w-full rounded-lg bg-[#0757B2] p-3.5 font-semibold text-white disabled:opacity-50"
             >
               Pay $19.00
             </button>

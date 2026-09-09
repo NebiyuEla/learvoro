@@ -53,16 +53,16 @@ export default async function LessonPage({
       <main className="grid lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="p-4 md:p-8">
           <div className="mx-auto max-w-5xl">
-            <div className="course-grid grid aspect-video place-items-center bg-[#073d49] text-white">
+            <div className="course-grid grid aspect-video place-items-center bg-[#073D86] text-white">
               <button
-                className="grid size-16 place-items-center rounded-full bg-white text-[#005a70]"
+                className="grid size-16 place-items-center rounded-full bg-white text-[#0757B2]"
                 aria-label="Play lesson"
               >
                 <Play className="ml-1" fill="currentColor" />
               </button>
             </div>
             <div className="bg-white p-6 md:p-8">
-              <p className="text-sm font-semibold text-[#007a9f]">
+              <p className="text-sm font-semibold text-[#0870C9]">
                 {lesson.section}
               </p>
               <h1 className="mt-2 font-heading text-2xl font-bold">
@@ -91,7 +91,7 @@ export default async function LessonPage({
                   {index < allLessons.length - 1 && (
                     <Link
                       href={`/learn/${course.slug}/lesson/${allLessons[index + 1].slug}`}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[#005a70] px-4 py-2.5 text-sm font-semibold text-white"
+                      className="inline-flex items-center gap-2 rounded-lg bg-[#0757B2] px-4 py-2.5 text-sm font-semibold text-white"
                     >
                       Next <ChevronRight size={17} />
                     </Link>
@@ -112,11 +112,11 @@ export default async function LessonPage({
                     ? `/learn/${course.slug}/lesson/${l.slug}`
                     : '#'
                 }
-                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${l.slug === lessonSlug ? 'bg-[#ddf8f1] text-[#005a70]' : 'hover:bg-[#f4f7f7]'}`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm ${l.slug === lessonSlug ? 'bg-[#E7F8F3] text-[#0757B2]' : 'hover:bg-[#f4f7f7]'}`}
               >
                 <span className="w-5 text-xs">{i + 1}</span>
                 {i < index ? (
-                  <CheckCircle2 size={16} className="text-[#00a090]" />
+                  <CheckCircle2 size={16} className="text-[#18B394]" />
                 ) : l.preview ? (
                   <Play size={15} />
                 ) : (

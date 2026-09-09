@@ -1,6 +1,6 @@
-# Claremint
+# Learvoro
 
-Claremint is a paid-learning platform built with Vinext/React, TypeScript, Cloudflare D1 and R2, Drizzle, and Stripe PaymentIntents.
+Learvoro is a paid-learning platform built with Vinext/React, TypeScript, Cloudflare D1 and R2, Drizzle, and Stripe PaymentIntents.
 
 ## Local development
 
@@ -9,7 +9,7 @@ Claremint is a paid-learning platform built with Vinext/React, TypeScript, Cloud
 3. Generate schema migrations after model changes with `npm run db:generate`.
 4. Apply `db/seed.sql` only to a local development database.
 
-Authentication in the hosted build uses the platform-owned sign-in flow. The original brief also requests standalone email/password and Google authentication; configure a production identity provider before using Claremint outside Sites.
+Authentication in the hosted build uses the platform-owned sign-in flow. The original brief also requests standalone email/password and Google authentication; configure a production identity provider before using Learvoro outside Sites.
 
 ## Stripe test flow
 
@@ -22,7 +22,7 @@ Set Stripe test-mode keys and forward Stripe CLI events to `/api/webhooks/stripe
 - Upload paid resources to the private R2 binding and issue them only through entitlement-checked server routes.
 - Configure a private/signed video provider and never persist public playback URLs.
 - Set `ADMIN_EMAILS`, then promote authorized records to `admin` through a controlled database operation.
-- Replace the temporary text wordmark only after the supplied official logo asset is available.
+- Keep the supplied Learvoro logo asset unchanged; layout cropping only removes its surrounding white space.
 
 ## Security model
 

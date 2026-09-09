@@ -1,5 +1,5 @@
 export const course = {
-  id:'course_portfolio', slug:'professional-portfolio-website', title:'Build Your First Professional Portfolio Website', category:'Development', level:'Beginner', instructor:'Claremint', price:1900, currency:'USD', language:'English', duration:'3 hours 20 minutes',
+  id:'course_portfolio', slug:'professional-portfolio-website', title:'Build Your First Professional Portfolio Website', category:'Development', level:'Beginner', instructor:'Learvoro', price:1900, currency:'USD', language:'English', duration:'3 hours 20 minutes',
   description:'Build and publish a professional personal portfolio website from scratch. Learn how to structure your content, create a clean responsive layout, showcase projects properly, deploy the site, and connect your own domain.',
   outcomes:['Plan a useful portfolio','Structure HTML correctly','Build responsive layouts','Style a professional interface','Create project cards','Add a contact section','Make the website mobile friendly','Deploy the website','Connect a custom domain'],
   requirements:['A computer','Internet connection','Basic computer knowledge','No professional development experience required'],

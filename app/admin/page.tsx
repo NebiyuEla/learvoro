@@ -18,7 +18,7 @@ export default async function Admin() {
           <Link href="/">
             <Logo />
           </Link>
-          <span className="ml-4 rounded bg-[#ddf8f1] px-2 py-1 text-xs font-semibold text-[#005a70]">
+          <span className="ml-4 rounded bg-[#E7F8F3] px-2 py-1 text-xs font-semibold text-[#0757B2]">
             Admin
           </span>
         </div>
@@ -43,7 +43,7 @@ export default async function Admin() {
               <a
                 key={x}
                 href="#"
-                className={`block rounded-lg px-3 py-2.5 ${i === 0 ? 'bg-[#ddf8f1] font-semibold text-[#005a70]' : 'text-[#526063]'}`}
+                className={`block rounded-lg px-3 py-2.5 ${i === 0 ? 'bg-[#E7F8F3] font-semibold text-[#0757B2]' : 'text-[#526063]'}`}
               >
                 {x}
               </a>
@@ -70,7 +70,7 @@ export default async function Admin() {
           <section className="mt-8 rounded-xl border bg-white p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold">Courses</h2>
-              <button className="rounded-lg bg-[#005a70] px-4 py-2 text-sm font-semibold text-white">
+              <button className="rounded-lg bg-[#0757B2] px-4 py-2 text-sm font-semibold text-white">
                 Create course
               </button>
             </div>
