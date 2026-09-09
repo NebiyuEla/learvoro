@@ -1,0 +1,3 @@
+import Link from 'next/link';
+export function Logo(){return <span className="brand-word" aria-label="Claremint">CLAREMINT</span>}
+export function SiteHeader(){return <header className="border-b bg-white"><div className="mx-auto flex h-16 max-w-[1180px] items-center gap-7 px-5 lg:px-8"><Link href="/"><Logo/></Link><nav className="hidden gap-5 text-sm font-medium md:flex"><Link href="/courses">Explore</Link><Link href="/#categories">Categories</Link><Link href="/#paths">Learning Paths</Link></nav><div className="ml-auto flex gap-2"><Link href="/login" className="px-3 py-2 text-sm font-semibold">Log in</Link><Link href="/signup" className="rounded-lg bg-[#005a70] px-4 py-2 text-sm font-semibold text-white">Sign up</Link></div></div></header>}
