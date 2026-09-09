@@ -1,16 +1,19 @@
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
-import { course } from '@/lib/course-data';
+import { findCourse } from '@/lib/course-data';
 import { StripePaymentProvider } from '@/server/payments/stripe';
 
 const runtime=()=>env as unknown as Record<string,string|undefined>;
-export async function POST(){
+export async function POST(request:Request){
   const user=await getChatGPTUser();
   if(!user)return Response.json({error:'AUTHENTICATION_REQUIRED'},{status:401});
+  const body=await request.json().catch(()=>({})) as {courseSlug?:string}; const course=findCourse(body.courseSlug??'');
+  if(!course)return Response.json({error:'COURSE_UNAVAILABLE'},{status:404});
   const secret=runtime().STRIPE_SECRET_KEY;
   const publishableKey=runtime().STRIPE_PUBLISHABLE_KEY;
   if(!secret||!publishableKey)return Response.json({error:'PAYMENTS_NOT_CONFIGURED'},{status:503});
   const db=(env as unknown as {DB:D1Database}).DB;
+  const initNow=Math.floor(Date.now()/1000); await db.prepare("INSERT OR IGNORE INTO courses (id,title,slug,description,level,language,price,currency,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?, 'published',?,?)").bind(course.id,course.title,course.slug,course.description,course.level,course.language,course.price,course.currency,initNow,initNow).run();
   const stored=await db.prepare('SELECT id, price, currency, status FROM courses WHERE slug = ? LIMIT 1').bind(course.slug).first<{id:string;price:number;currency:string;status:string}>();
   if(!stored||stored.status!=='published')return Response.json({error:'COURSE_UNAVAILABLE'},{status:404});
   const owned=await db.prepare("SELECT id FROM entitlements WHERE user_id = ? AND course_id = ? AND status = 'active' LIMIT 1").bind(user.userId,stored.id).first();

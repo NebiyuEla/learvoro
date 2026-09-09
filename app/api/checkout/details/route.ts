@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
+import { findCourse } from '@/lib/course-data';
 
 type CheckoutDetails = {
   courseSlug?: unknown;
@@ -35,6 +36,17 @@ export async function POST(request: Request) {
     return Response.json({ error: 'MISSING_REQUIRED_DETAILS' }, { status: 400 });
 
   const db = (env as unknown as { DB: D1Database }).DB;
+  const catalogCourse = findCourse(courseSlug);
+  if (!catalogCourse)
+    return Response.json({ error: 'COURSE_UNAVAILABLE' }, { status: 404 });
+  const now = Math.floor(Date.now() / 1000);
+  await db.prepare("INSERT OR IGNORE INTO courses (id,title,slug,description,level,language,price,currency,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?, 'published',?,?)")
+    .bind(catalogCourse.id,catalogCourse.title,catalogCourse.slug,catalogCourse.description,catalogCourse.level,catalogCourse.language,catalogCourse.price,catalogCourse.currency,now,now).run();
+  const catalogStatements = catalogCourse.sections.flatMap((section, sectionIndex) => {
+    const sectionId = `${catalogCourse.id}_section_${sectionIndex + 1}`;
+    return [db.prepare('INSERT OR IGNORE INTO course_sections (id,course_id,title,position,created_at,updated_at) VALUES (?,?,?,?,?,?)').bind(sectionId,catalogCourse.id,section.title,sectionIndex + 1,now,now),...section.lessons.map((lesson, lessonIndex) => db.prepare("INSERT OR IGNORE INTO lessons (id,section_id,title,slug,type,duration_seconds,is_preview,position,created_at,updated_at) VALUES (?,?,?,?, 'article',?,?,?,?,?,?)").bind(`${catalogCourse.id}_${lesson.slug}`,sectionId,lesson.title,lesson.slug,Number.parseInt(lesson.duration)*60,lesson.preview?1:0,lessonIndex + 1,now,now))];
+  });
+  if (catalogStatements.length) await db.batch(catalogStatements);
   const stored = await db
     .prepare("SELECT id FROM courses WHERE slug = ? AND status = 'published' LIMIT 1")
     .bind(courseSlug)
@@ -42,7 +54,6 @@ export async function POST(request: Request) {
   if (!stored)
     return Response.json({ error: 'COURSE_UNAVAILABLE' }, { status: 404 });
 
-  const now = Math.floor(Date.now() / 1000);
   const draftId = crypto.randomUUID();
   await db.batch([
     db.prepare("INSERT INTO users (id,email,first_name,last_name,role,created_at,updated_at) VALUES (?,?,?,?, 'student',?,?) ON CONFLICT(id) DO UPDATE SET email=excluded.email, updated_at=excluded.updated_at")
