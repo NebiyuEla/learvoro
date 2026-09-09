@@ -1,0 +1,1 @@
+import{cookies}from'next/headers';export async function GET(request:Request){(await cookies()).delete('learvoro_session');const to=new URL(request.url).searchParams.get('returnTo');return Response.redirect(new URL(to?.startsWith('/')&&!to.startsWith('//')?to:'/',request.url))}

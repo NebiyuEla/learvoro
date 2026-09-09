@@ -1,7 +1,7 @@
 /* oxlint-disable next/no-html-link-for-pages */
 /* oxlint-disable jsx-a11y/anchor-is-valid */
 import { redirect } from 'next/navigation';
-import { env } from 'cloudflare:workers';
+import { env } from '@/lib/runtime';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 import { Logo } from '@/components/site-header';
 export const dynamic = 'force-dynamic';

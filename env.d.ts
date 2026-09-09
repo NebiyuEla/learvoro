@@ -1,5 +1,1 @@
-declare namespace Cloudflare {
-  interface Env {
-    FILES: R2Bucket;
-  }
-}
+type D1Database = typeof import('./lib/runtime').env.DB;

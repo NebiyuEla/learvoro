@@ -1,4 +1,4 @@
-import{env}from'cloudflare:workers';import{cookies}from'next/headers';
+import{env}from'@/lib/runtime';import{cookies}from'next/headers';
 const runtime=()=>env as unknown as Record<string,string|undefined>;const enc=new TextEncoder();
 async function signature(value:string){const secret=runtime().ADMIN_SESSION_SECRET;if(!secret)return'';const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const bytes=new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(value)));return Array.from(bytes).map(x=>x.toString(16).padStart(2,'0')).join('')}
 export async function createAdminToken(){const expires=Date.now()+8*60*60*1000;const value=`admin.${expires}`;return`${value}.${await signature(value)}`}

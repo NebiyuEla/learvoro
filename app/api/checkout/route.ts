@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers';
+import { env } from '@/lib/runtime';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { findCourse } from '@/lib/course-data';
 import { StripePaymentProvider } from '@/server/payments/stripe';

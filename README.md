@@ -1,32 +1,31 @@
 # Learvoro
 
-Learvoro is a paid-learning platform built with Vinext/React, TypeScript, Cloudflare D1 and R2, Drizzle, and Stripe PaymentIntents.
+Learvoro is a paid-learning platform built with Next.js, TypeScript, PostgreSQL, secure cookie sessions, Google OAuth, and Stripe PaymentIntents.
 
 ## Local development
 
-1. Copy `.env.example` to `.env.local` and add test-only provider credentials.
+1. Copy `.env.example` to `.env.local`, set `DATABASE_URL` to PostgreSQL, and add test-only provider credentials.
 2. Run `npm install` and `npm run dev`.
-3. Generate schema migrations after model changes with `npm run db:generate`.
-4. Apply `db/seed.sql` only to a local development database.
+3. Required PostgreSQL tables are created on the first database-backed request.
 
-Authentication in the hosted build uses the platform-owned sign-in flow. The original brief also requests standalone email/password and Google authentication; configure a production identity provider before using Learvoro outside Sites.
+Email/password authentication stores only bcrypt password hashes. Google sign-in requires a Google OAuth web client with `/api/auth/google/callback` configured as an authorized redirect URI.
 
 ## Stripe test flow
 
-Set Stripe test-mode keys and forward Stripe CLI events to `/api/webhooks/stripe`. The checkout endpoint reads the published course price from D1, creates or recovers one pending order, and uses its order ID as the Stripe idempotency key. The verified webhook validates order ownership, amount and currency before granting an entitlement. Use only the test payment methods documented by Stripe; no card number is included in this application.
+Set Stripe test-mode keys and forward Stripe CLI events to `/api/webhooks/stripe`. The checkout endpoint reads the published course price from PostgreSQL, creates or recovers one pending order, and uses its order ID as the Stripe idempotency key. The verified webhook validates order ownership, amount and currency before granting an entitlement. Use only the test payment methods documented by Stripe; no card number is included in this application.
 
 ## Production setup
 
 - Configure Stripe, email and video provider secrets through the hosting control plane, never in source.
 - Configure the Stripe webhook signing secret and subscribe to PaymentIntent success/failure, refund and dispute events.
-- Upload paid resources to the private R2 binding and issue them only through entitlement-checked server routes.
+- Store paid resources in private object storage and issue them only through entitlement-checked server routes.
 - Configure a private/signed video provider and never persist public playback URLs.
-- Set `ADMIN_EMAILS`, then promote authorized records to `admin` through a controlled database operation.
+- Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` for `/adminplatform`.
 - Keep the supplied Learvoro logo asset unchanged; layout cropping only removes its surrounding white space.
 
 ## Security model
 
-Price and enrollment decisions are server-side. Entitlements are per user and course. Stripe webhook signatures and event IDs prevent forged or duplicate fulfillment. D1 uniqueness constraints prevent duplicate entitlements, progress rows, reviews and wishlist entries. No raw card data, CVC, passwords, tokens or permanent paid-resource URLs are stored.
+Price and enrollment decisions are server-side. Entitlements are per user and course. Stripe webhook signatures and event IDs prevent forged or duplicate fulfillment. PostgreSQL uniqueness constraints prevent duplicate entitlements and progress rows. No raw card data, CVC, or OAuth tokens are stored; passwords are stored only as bcrypt hashes.
 
 ## Validation
 
