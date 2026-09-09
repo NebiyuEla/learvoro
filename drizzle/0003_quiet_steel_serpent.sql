@@ -1,0 +1,1 @@
+ALTER TABLE `checkout_drafts` ADD `save_details` integer DEFAULT true NOT NULL;
