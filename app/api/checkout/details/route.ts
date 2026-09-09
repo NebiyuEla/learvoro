@@ -55,12 +55,14 @@ export async function POST(request: Request) {
     return Response.json({ error: 'COURSE_UNAVAILABLE' }, { status: 404 });
 
   const draftId = crypto.randomUUID();
+  const studentReference = `LRV-${draftId.slice(0, 8).toUpperCase()}`;
   await db.batch([
     db.prepare("INSERT INTO users (id,email,first_name,last_name,role,created_at,updated_at) VALUES (?,?,?,?, 'student',?,?) ON CONFLICT(id) DO UPDATE SET email=excluded.email, updated_at=excluded.updated_at")
       .bind(user.userId, user.email, fullName.split(' ')[0] || null, fullName.split(' ').slice(1).join(' ') || null, now, now),
-    db.prepare("INSERT INTO checkout_drafts (id,user_id,course_id,email,full_name,country_code,address_line_1,city,postal_code,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,'draft',?,?) ON CONFLICT(user_id,course_id) DO UPDATE SET email=excluded.email, full_name=excluded.full_name, country_code=excluded.country_code, address_line_1=excluded.address_line_1, city=excluded.city, postal_code=excluded.postal_code, status='draft', updated_at=excluded.updated_at")
-      .bind(draftId, user.userId, stored.id, user.email, fullName, countryCode, addressLine1, city, postalCode, now, now),
+    db.prepare("INSERT INTO checkout_drafts (id,user_id,course_id,email,full_name,student_reference,learning_mode,country_code,address_line_1,city,postal_code,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'self-paced',?,?,?,?, 'draft',?,?) ON CONFLICT(user_id,course_id) DO UPDATE SET email=excluded.email, full_name=excluded.full_name, country_code=excluded.country_code, address_line_1=excluded.address_line_1, city=excluded.city, postal_code=excluded.postal_code, status='draft', updated_at=excluded.updated_at")
+      .bind(draftId, user.userId, stored.id, user.email, fullName, studentReference, countryCode, addressLine1, city, postalCode, now, now),
   ]);
 
-  return Response.json({ saved: true });
+  const saved = await db.prepare('SELECT student_reference FROM checkout_drafts WHERE user_id=? AND course_id=? LIMIT 1').bind(user.userId,stored.id).first<{student_reference:string}>();
+  return Response.json({ saved: true, studentReference: saved?.student_reference ?? studentReference });
 }

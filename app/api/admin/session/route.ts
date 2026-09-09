@@ -1,0 +1,3 @@
+import{cookies}from'next/headers';import{adminConfigured,createAdminToken,validAdminCredentials}from'@/lib/admin-auth';
+export async function POST(request:Request){if(!adminConfigured())return Response.json({error:'ADMIN_NOT_CONFIGURED'},{status:503});const body=await request.json().catch(()=>({}))as{email?:string;password?:string};if(!validAdminCredentials(body.email??'',body.password??''))return Response.json({error:'INVALID_CREDENTIALS'},{status:401});(await cookies()).set('learvoro_admin',await createAdminToken(),{httpOnly:true,secure:true,sameSite:'strict',path:'/adminplatform',maxAge:28800});return Response.json({ok:true})}
+export async function DELETE(){(await cookies()).delete('learvoro_admin');return Response.json({ok:true})}

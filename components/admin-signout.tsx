@@ -1,0 +1,1 @@
+'use client';export function AdminSignout(){return <button onClick={async()=>{await fetch('/api/admin/session',{method:'DELETE'});location.reload()}} className="rounded-lg border px-4 py-2 text-sm font-semibold">Sign out</button>}
