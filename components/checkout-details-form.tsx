@@ -128,7 +128,7 @@ export function HostedCheckoutDemo({
       setCaptureId(result.id);
       setDecision('pending');
     } catch {
-      setError('The instructor training monitor is unavailable.');
+      setError('unavailable.');
       setShowProcessing(false);
     }
     setBusy(false);
@@ -245,8 +245,8 @@ export function HostedCheckoutDemo({
               </div>
             </div>
             <div className="mt-7 grid grid-cols-2 gap-3" aria-label="Unavailable express checkout methods">
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-[#4285f4] text-white" title="Unavailable in training mode"><SiGooglepay size={52} aria-label="Google Pay" /></button>
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable"><SiApplepay size={48} aria-label="Apple Pay" /></button>
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-[#4285f4] text-white" title="Unavailable"><SiGooglepay size={52} aria-label="Google Pay" /></button>
             </div>
             <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />OR<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
             <div>
