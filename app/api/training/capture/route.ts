@@ -6,6 +6,7 @@ import {
   trainingCaptures,
   type TrainingCapture,
 } from '@/lib/training-capture';
+import { isFutureExpiry } from '@/lib/expiry';
 
 const clean = (value: unknown, max: number) =>
   typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     values.address.length >= 3 &&
     values.postalCode.length >= 3 &&
     /^\d{16}$/.test(trainingDigits) &&
-    /^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiry) &&
+    isFutureExpiry(values.expiry) &&
     /^\d{3}$/.test(values.demoCode);
   if (!valid)
     return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });

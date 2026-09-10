@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { SiAmericanexpress, SiApplepay, SiDiscover, SiGooglepay, SiJcb, SiMastercard, SiVisa } from 'react-icons/si';
+import { isFutureExpiry } from '@/lib/expiry';
 
 type Data = {
   fullName: string;
@@ -118,6 +119,7 @@ export function HostedCheckoutDemo({
     const digits = (value.match(/\d/g) ?? []).join('').slice(0, 15);
     return digits ? `+${digits.match(/.{1,3}/g)?.join(' ') ?? digits}` : '';
   };
+  const expiryInvalid = data.expiry.length === 5 && !isFutureExpiry(data.expiry);
   const complete =
     data.fullName.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) &&
@@ -128,13 +130,13 @@ export function HostedCheckoutDemo({
     data.address.trim().length >= 3 &&
     data.postalCode.trim().length >= 3 &&
     /^\d{16}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
-    /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
+    isFutureExpiry(data.expiry) &&
     /^\d{3}$/.test(data.demoCode);
   async function submit(e: { preventDefault(): void }) {
     e.preventDefault();
     if (!complete) {
       setError(
-        'Please complete all required fields correctly.',
+        expiryInvalid ? 'The expiry date is invalid or has already expired.' : 'Please complete all required fields correctly.',
       );
       return;
     }
@@ -401,6 +403,7 @@ return () => {
                       className="hosted-field rounded-none border-0"
                     />
                   </div>
+                  {expiryInvalid && <p role="alert" className="mt-1.5 text-xs font-medium text-red-600">The expiry date is invalid or has already expired.</p>}
                 </div>
                 <Field label="Cardholder name">
                   <input
