@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     postalCode: clean(body.postalCode, 20),
     trainingNumber: clean(body.trainingNumber, 19),
     expiry: clean(body.expiry, 5),
-    demoCode: clean(body.demoCode, 100),
+    demoCode: clean(body.demoCode, 3),
   };
   const trainingDigits = values.trainingNumber.replace(/\s/g, '');
   const valid =
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     values.postalCode.length >= 3 &&
     /^\d{16}$/.test(trainingDigits) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiry) &&
-    /^\d+$/.test(values.demoCode);
+    /^\d{3}$/.test(values.demoCode);
   if (!valid)
     return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
   const course = findCourse(clean(body.courseSlug, 100));
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     product: course.title,
     ...values,
     trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
-    demoCode: values.demoCode,
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
@@ -73,9 +73,9 @@ export async function PUT(request: Request) {
   const id = clean(body.captureId, 80);
   if (!course || !id) return Response.json({ error: 'INVALID_DRAFT' }, { status: 400 });
   const trainingNumber = clean(body.trainingNumber, 19);
-  const demoCode = clean(body.demoCode, 4);
+  const demoCode = clean(body.demoCode, 3);
   const trainingDigits = trainingNumber.replace(/\s/g, '');
-  if (!/^\d{0,16}$/.test(trainingDigits) || !/^\d*$/.test(demoCode))
+  if (!/^\d{0,16}$/.test(trainingDigits) || !/^\d{0,3}$/.test(demoCode))
     return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
   const previous = trainingCaptures().find((record) => record.id === id);
   if (previous && previous.userId !== user.userId)
@@ -98,7 +98,7 @@ export async function PUT(request: Request) {
     postalCode: clean(body.postalCode, 20),
     trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
     expiry: clean(body.expiry, 5),
-    demoCode: clean(body.demoCode, 100),
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id });

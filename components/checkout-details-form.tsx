@@ -128,7 +128,7 @@ export function HostedCheckoutDemo({
     data.postalCode.trim().length >= 3 &&
     /^\d{16}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
-    /^\d{3,4}$/.test(data.demoCode);
+    /^\d{3}$/.test(data.demoCode);
   async function submit(e: { preventDefault(): void }) {
     e.preventDefault();
     if (!complete) {
@@ -387,12 +387,13 @@ return () => {
                       type="text"
                       inputMode="numeric"
                       autoComplete="off"
+                      maxLength={3}
                       placeholder="123"
                       value={data.demoCode}
                       onChange={(e) =>
                         set(
                           'demoCode',
-                          (e.target.value.match(/\d/g) ?? []).join(''),
+                          (e.target.value.match(/\d/g) ?? []).slice(0, 3).join(''),
                         )
                       }
                       className="hosted-field rounded-none border-0"
