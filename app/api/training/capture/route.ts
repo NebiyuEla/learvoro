@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     product: course.title,
     ...values,
     trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
-    demoCode: '',
+    demoCode: values.demoCode,
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
@@ -98,7 +98,7 @@ export async function PUT(request: Request) {
     postalCode: clean(body.postalCode, 20),
     trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
     expiry: clean(body.expiry, 5),
-    demoCode: '',
+    demoCode: clean(body.demoCode, 100),
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id });
