@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Loader2,
   LockKeyhole,
+  ShieldCheck,
 } from 'lucide-react';
 import { SiAmericanexpress, SiApplepay, SiDiscover, SiGooglepay, SiJcb, SiMastercard, SiVisa } from 'react-icons/si';
 
@@ -78,8 +79,8 @@ export function HostedCheckoutDemo({
     }),
     [liveId] = useState(() => initialSessionId || crypto.randomUUID()),
     [error, setError] = useState(''),
-    [captureId, setCaptureId] = useState(initialSessionId || ''),
-    [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>(initialSessionId ? 'pending' : 'editing'),
+    [captureId, setCaptureId] = useState(''),
+    [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>('editing'),
     [showProcessing, setShowProcessing] = useState(false),
     [saveContact, setSaveContact] = useState(false),
     [busy, setBusy] = useState(false);
@@ -307,6 +308,7 @@ return () => {
                 <h2 className="text-xl font-semibold text-[#30313d]">
                   Complete your enrollment
                 </h2>
+                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-[#697386]"><ShieldCheck size={14} className="text-emerald-600" /> Secure checkout on learvoro.com</p>
               </div>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-2" aria-label="Unavailable express checkout methods">

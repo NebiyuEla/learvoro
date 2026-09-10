@@ -1,6 +1,9 @@
 export default function CheckoutLoading() {
   return (
-    <main className="grid min-h-screen bg-white lg:grid-cols-2" aria-label="Loading checkout">
+    <main className="relative grid min-h-screen bg-white lg:grid-cols-2" aria-label="Preparing secure checkout">
+      <div className="absolute left-1/2 top-5 z-10 hidden -translate-x-1/2 items-center gap-2 rounded-full border bg-white px-4 py-2 text-xs font-semibold text-[#526063] shadow-sm lg:flex">
+        <span className="size-2 animate-pulse rounded-full bg-emerald-500" /> Preparing secure checkout
+      </div>
       <section className="bg-[#f7f8fa] px-6 py-12 lg:flex lg:justify-end lg:px-12">
         <div className="w-full max-w-[520px] animate-pulse">
           <div className="h-4 w-28 rounded bg-slate-200" />

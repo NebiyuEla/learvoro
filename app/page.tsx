@@ -28,7 +28,7 @@ const categories = [
 export default async function Home() {
   const user = await getChatGPTUser();
   return (
-    <div className="min-h-screen bg-[#f8fafa] text-[#162326]">
+    <div className="home-motion min-h-screen bg-[#f8fafa] text-[#162326]">
       <header className="sticky top-0 z-40 border-b border-[#e4e9e9] bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-18 max-w-[1440px] items-center gap-8 px-5 lg:px-10">
           <a href="/" className="shrink-0">

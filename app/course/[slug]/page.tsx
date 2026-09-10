@@ -23,6 +23,7 @@ export default async function CoursePage({
   const baseCourse = findCourse(slug);
   if (!baseCourse) redirect("/courses");
   const course = withPrice(baseCourse, await coursePrices());
+  const checkoutSession = Array.from({ length: 4 }, () => crypto.randomUUID().replaceAll('-', '')).join('');
   const count = course.sections.reduce((n, s) => n + s.lessons.length, 0);
   return (
     <>
@@ -148,7 +149,7 @@ export default async function CoursePage({
               <div className="p-6">
                 <p className="text-3xl font-bold">{formatPrice(course)}</p>
                 <Link
-                  href={`/checkout/${course.slug}`}
+                  href={`/checkout/${course.slug}?session=${checkoutSession}`}
                   className="mt-5 block rounded-lg bg-[#0757B2] px-5 py-3.5 text-center font-semibold text-white"
                 >
                   Buy course
