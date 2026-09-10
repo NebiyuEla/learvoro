@@ -1,6 +1,7 @@
 databases:
   - name: learvoro-db
     plan: free
+    ipAllowList: []
 
 services:
   - type: web
@@ -8,6 +9,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm ci && npm run build
+    preDeployCommand: npm run db:migrate
     startCommand: npm start
     healthCheckPath: /
     envVars:
