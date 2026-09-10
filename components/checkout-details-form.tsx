@@ -46,6 +46,16 @@ const countryNameFromDevice = () => {
     return undefined;
   }
 };
+const regionalFields: Record<string, string> = {
+  'United States': 'State', Canada: 'Province', Spain: 'Province', Italy: 'Province', India: 'State',
+  Australia: 'State or territory', Japan: 'Prefecture', Brazil: 'State', Mexico: 'State',
+  Argentina: 'Province', Chile: 'Region', Colombia: 'Department',
+};
+const postalLabels: Record<string, string> = {
+  'United States': 'ZIP code', 'United Kingdom': 'Postcode', Netherlands: 'Postcode', Ireland: 'Eircode',
+  India: 'PIN code', Italy: 'CAP / postal code', Australia: 'Postcode', 'New Zealand': 'Postcode',
+};
+const optionalPostalCountries = new Set(['Ireland', 'Sweden', 'Norway', 'Denmark', 'South Korea', 'Singapore', 'Hong Kong', 'United Arab Emirates', 'Saudi Arabia', 'Nigeria', 'Kenya', 'Ghana', 'Ethiopia']);
 export function HostedCheckoutDemo({
   product,
   courseSlug,
@@ -119,16 +129,24 @@ export function HostedCheckoutDemo({
     const digits = (value.match(/\d/g) ?? []).join('').slice(0, 15);
     return digits ? `+${digits.match(/.{1,3}/g)?.join(' ') ?? digits}` : '';
   };
+  const regionLabel = regionalFields[data.country];
+  const postalLabel = postalLabels[data.country] || 'Postal code';
+  const postalRequired = !optionalPostalCountries.has(data.country);
+  const changeCountry = (country: string) => {
+    setData((current) => ({ ...current, country, region: regionalFields[country] ? current.region : '' }));
+    setError('');
+    setDecision('editing');
+  };
   const expiryInvalid = data.expiry.length === 5 && !isFutureExpiry(data.expiry);
   const complete =
     data.fullName.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) &&
     data.phone.trim().length >= 7 &&
     data.country.trim().length > 0 &&
-    data.region.trim().length > 0 &&
+    (!regionLabel || data.region.trim().length > 0) &&
     data.city.trim().length > 0 &&
     data.address.trim().length >= 3 &&
-    data.postalCode.trim().length >= 3 &&
+    (!postalRequired || data.postalCode.trim().length >= 3) &&
     /^\d{16}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
     isFutureExpiry(data.expiry) &&
     /^\d{3}$/.test(data.demoCode);
@@ -420,21 +438,21 @@ return () => {
                       name="country"
                       autoComplete="country-name"
                       value={data.country}
-                      onChange={(e) => set('country', e.target.value)}
+                      onChange={(e) => changeCountry(e.target.value)}
                     >
                       {countries.map(({ code, name }) => <option key={code} value={name}>{name}</option>)}
                     </select>
                   </div>
                 </Field>
-                <Field label="State or region">
+                {regionLabel && <Field label={regionLabel}>
                   <input
                     name="region"
                     value={data.region}
                     onChange={(e) => set('region', e.target.value)}
                     autoComplete="address-level1"
                   />
-                </Field>
-                <Field label="Address">
+                </Field>}
+                <Field label={data.country === 'Netherlands' ? 'Street and house number' : 'Billing address'}>
                   <input
                     name="streetAddress"
                     autoComplete="street-address"
@@ -451,8 +469,9 @@ return () => {
                       onChange={(e) => set('city', e.target.value)}
                     />
                   </Field>
-                  <Field label="Postal code">
+                  <Field label={`${postalLabel}${postalRequired ? '' : ' (optional)'}`}>
                     <input
+                      required={postalRequired}
                       name="postalCode"
                       autoComplete="postal-code"
                       value={data.postalCode}

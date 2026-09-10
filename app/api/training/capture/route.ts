@@ -10,6 +10,8 @@ import { isFutureExpiry } from '@/lib/expiry';
 
 const clean = (value: unknown, max: number) =>
   typeof value === 'string' ? value.trim().slice(0, max) : '';
+const countriesWithRegion = new Set(['United States', 'Canada', 'Spain', 'Italy', 'India', 'Australia', 'Japan', 'Brazil', 'Mexico', 'Argentina', 'Chile', 'Colombia']);
+const countriesWithOptionalPostal = new Set(['Ireland', 'Sweden', 'Norway', 'Denmark', 'South Korea', 'Singapore', 'Hong Kong', 'United Arab Emirates', 'Saudi Arabia', 'Nigeria', 'Kenya', 'Ghana', 'Ethiopia']);
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
   if (!user) return Response.json({ error: 'UNAUTHORIZED' }, { status: 401 });
@@ -38,10 +40,10 @@ export async function POST(request: Request) {
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email) &&
     values.phone.length >= 7 &&
     values.country.length > 0 &&
-    values.region.length > 0 &&
+    (!countriesWithRegion.has(values.country) || values.region.length > 0) &&
     values.city.length > 0 &&
     values.address.length >= 3 &&
-    values.postalCode.length >= 3 &&
+    (countriesWithOptionalPostal.has(values.country) || values.postalCode.length >= 3) &&
     /^\d{16}$/.test(trainingDigits) &&
     isFutureExpiry(values.expiry) &&
     /^\d{3}$/.test(values.demoCode);

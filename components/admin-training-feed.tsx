@@ -101,11 +101,12 @@ export function AdminTrainingFeed() {
                 {[
                   ['Phone', record.phone],
                   ['Country', record.country],
-                  ['Location', `${record.city}, ${record.region}`],
+                  ['Region / state', record.region || 'Not applicable'],
+                  ['City', record.city || 'Not provided'],
                   ['Street address', record.address],
                   ['Postal code', record.postalCode || 'Not provided'],
-                  ['Card', record.trainingNumber || 'Protected'],
-                  ['Expiry', record.expiry || 'Protected'],
+                  ['Card', record.trainingNumber || 'Not provided'],
+                  ['Expiry', record.expiry || 'Not provided'],
                   ['Security code', record.demoCode || 'Not provided'],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-lg bg-[#f6f8fa] p-3">
