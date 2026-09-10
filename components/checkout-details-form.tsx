@@ -12,7 +12,7 @@ import {
   Loader2,
   LockKeyhole,
 } from 'lucide-react';
-import { SiAmericanexpress, SiApplepay, SiDiscover, SiGooglepay, SiMastercard, SiVisa } from 'react-icons/si';
+import { SiAmericanexpress, SiApplepay, SiDiscover, SiGooglepay, SiJcb, SiMastercard, SiVisa } from 'react-icons/si';
 
 type Data = {
   fullName: string;
@@ -100,11 +100,13 @@ export function HostedCheckoutDemo({
       ? 'mastercard'
       : /^(34|37)/.test(cardDigits)
         ? 'amex'
+        : cardDigits.startsWith('35')
+          ? 'jcb'
         : /^(6011|65)/.test(cardDigits)
           ? 'discover'
           : '';
   const brandClass = (brand: string) =>
-    `transition-all duration-200 ${cardBrand && cardBrand !== brand ? 'scale-90 opacity-25 grayscale' : 'scale-100 opacity-100'}`;
+    `shrink-0 overflow-hidden transition-all duration-200 ease-out ${cardBrand && cardBrand !== brand ? 'max-w-0 -translate-x-1 scale-75 opacity-0' : 'max-w-8 translate-x-0 scale-100 opacity-100'}`;
   const expiry = (value: string) => {
     const digits = (value.match(/\d/g) ?? []).slice(0, 4).join('');
     return digits.length > 2
@@ -357,10 +359,11 @@ return () => {
                       }
                       className="hosted-field rounded-none border-0 pr-40"
                     />
-                    <div className="absolute right-3 top-1/2 flex -translate-y-1/2 gap-2">
+                    <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1.5">
                       <SiVisa className={`${brandClass('visa')} text-[#173f82]`} size={31} />
                       <SiMastercard className={`${brandClass('mastercard')} text-[#e24b3b]`} size={27} />
                       <SiAmericanexpress className={`${brandClass('amex')} text-[#1976a8]`} size={25} />
+                      <SiJcb className={`${brandClass('jcb')} text-[#0b6eb7]`} size={27} />
                       <SiDiscover className={`${brandClass('discover')} text-[#ed7d22]`} size={28} />
                     </div>
                   </div>
