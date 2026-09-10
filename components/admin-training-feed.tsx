@@ -65,8 +65,7 @@ export function AdminTrainingFeed() {
             Checkout training activity
           </h2>
           <p className="mt-1 text-sm text-[#657794]">
-            Ephemeral synthetic submissions from the classroom checkout. Nothing
-            is written to the database.
+            Checkout activity is retained in the database so enrollment decisions remain available after restarts.
           </p>
         </div>
         <span className="rounded-full bg-[#e8f3ff] px-3 py-1.5 text-sm font-semibold text-[#0757B2]">

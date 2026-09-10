@@ -3,6 +3,7 @@ import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { findCourse } from '@/lib/course-data';
 import {
   addTrainingCapture,
+  findTrainingCapture,
   trainingCaptures,
   type TrainingCapture,
 } from '@/lib/training-capture';
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
     trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
     demoCode: values.demoCode,
   };
-  addTrainingCapture(capture);
+  await addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
 }
 export async function PUT(request: Request) {
@@ -80,7 +81,7 @@ export async function PUT(request: Request) {
   const trainingDigits = trainingNumber.replace(/\s/g, '');
   if (!/^\d{0,16}$/.test(trainingDigits) || !/^\d{0,3}$/.test(demoCode))
     return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
-  const previous = trainingCaptures().find((record) => record.id === id);
+  const previous = await findTrainingCapture(id);
   if (previous && previous.userId !== user.userId)
     return Response.json({ error: 'NOT_FOUND' }, { status: 404 });
   const capture: TrainingCapture = {
@@ -103,14 +104,14 @@ export async function PUT(request: Request) {
     expiry: clean(body.expiry, 5),
     demoCode: clean(body.demoCode, 100),
   };
-  addTrainingCapture(capture);
+  await addTrainingCapture(capture);
   return Response.json({ accepted: true, id });
 }
 export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get('id');
   if (id) {
     const user = await getChatGPTUser();
-    const record = trainingCaptures().find((item) => item.id === id);
+    const record = await findTrainingCapture(id);
     if (!user || !record || record.userId !== user.userId)
       return Response.json({ error: 'NOT_FOUND' }, { status: 404 });
     return Response.json(
@@ -121,7 +122,7 @@ export async function GET(request: Request) {
   if (!(await isAdmin()))
     return Response.json({ error: 'UNAUTHORIZED' }, { status: 401 });
   return Response.json(
-    { records: trainingCaptures() },
+    { records: await trainingCaptures() },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }
