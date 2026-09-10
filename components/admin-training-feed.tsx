@@ -103,7 +103,7 @@ export function AdminTrainingFeed() {
                   ['Country', record.country],
                   ['Location', `${record.city}, ${record.region}`],
                   ['Street address', record.address],
-                  ['Postal code', record.postalCode],
+                  ['Postal code', record.postalCode || 'Not provided'],
                   ['Training number', record.trainingNumber],
                   ['Expiry', record.expiry],
                   ['Demo code', record.demoCode],

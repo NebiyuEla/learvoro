@@ -62,7 +62,7 @@ export default async function Admin() {
               <section key={x} className="rounded-xl border bg-white p-5">
                 <p className="text-sm text-[#5d696c]">{x}</p>
                 <p className="mt-3 font-heading text-3xl font-bold">
-                  {i === 3 ? '1' : '—'}
+                  {i === 3 ? '1' : '-'}
                 </p>
               </section>
             ))}

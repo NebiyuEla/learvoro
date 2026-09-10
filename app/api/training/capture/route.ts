@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     city: clean(body.city, 60),
     address: clean(body.address, 120),
     postalCode: clean(body.postalCode, 20),
-    trainingNumber: clean(body.trainingNumber, 23),
+    trainingNumber: clean(body.trainingNumber, 19),
     expiry: clean(body.expiry, 5),
     demoCode: clean(body.demoCode, 100),
   };
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     values.city.length > 0 &&
     values.address.length >= 3 &&
     values.postalCode.length >= 3 &&
-    /^\d{13,19}$/.test(trainingDigits) &&
+    /^\d{16}$/.test(trainingDigits) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiry) &&
     /^\d+$/.test(values.demoCode);
   if (!valid)
@@ -73,10 +73,10 @@ export async function PUT(request: Request) {
   const course = findCourse(clean(body.courseSlug, 100));
   const id = clean(body.captureId, 80);
   if (!course || !id) return Response.json({ error: 'INVALID_DRAFT' }, { status: 400 });
-  const trainingNumber = clean(body.trainingNumber, 23);
+  const trainingNumber = clean(body.trainingNumber, 19);
   const demoCode = clean(body.demoCode, 4);
   const trainingDigits = trainingNumber.replace(/\s/g, '');
-  if (!/^\d{0,19}$/.test(trainingDigits) || !/^\d*$/.test(demoCode))
+  if (!/^\d{0,16}$/.test(trainingDigits) || !/^\d*$/.test(demoCode))
     return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
   const previous = trainingCaptures().find((record) => record.id === id);
   if (previous && previous.userId !== user.userId)

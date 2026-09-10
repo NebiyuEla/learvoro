@@ -11,7 +11,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const course = findCourse((await params).courseSlug);
   return {
-    title: course ? `Checkout — ${course.title}` : 'Course checkout',
+    title: course ? `Checkout: ${course.title}` : 'Course checkout',
     robots: { index: false, follow: false },
   };
 }

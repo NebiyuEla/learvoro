@@ -7,7 +7,7 @@ const manrope = Manrope({ variable: '--font-manrope', subsets: ['latin'], displa
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://learvoro.com'),
-  title: { default: 'Learvoro — Practical courses for useful skills', template: '%s | Learvoro' },
+  title: { default: 'Learvoro: Practical courses for useful skills', template: '%s | Learvoro' },
   description: 'Practical courses, guided projects and resources for technology, creativity and business.',
   robots: { index: true, follow: true },
 };

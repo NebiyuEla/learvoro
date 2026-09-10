@@ -100,7 +100,7 @@ export function HostedCheckoutDemo({
     setDecision('editing');
   };
   const card = (value: string) => {
-    const digits = (value.match(/\d/g) ?? []).join('').slice(0, 19);
+    const digits = (value.match(/\d/g) ?? []).join('').slice(0, 16);
     return digits.match(/.{1,4}/g)?.join(' ') ?? '';
   };
   const expiry = (value: string) => {
@@ -118,7 +118,7 @@ export function HostedCheckoutDemo({
     data.city.trim().length > 0 &&
     data.address.trim().length >= 3 &&
     data.postalCode.trim().length >= 3 &&
-    /^\d{13,19}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
+    /^\d{16}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
     /^\d{3,4}$/.test(data.demoCode);
   async function submit(e: { preventDefault(): void }) {
@@ -442,7 +442,7 @@ export function HostedCheckoutDemo({
             {decision === 'approved' && (
               <div className="checkout-success mt-4 flex gap-3 rounded-xl bg-[#eafaf2] p-5 text-sm text-[#08784f]">
                 <CheckCircle2 className="shrink-0" size={30} />
-                <p><b className="text-base">Payment approved — you’re enrolled!</b><br />Opening your course library now…</p>
+                <p><b className="text-base">Payment approved. You are enrolled!</b><br />Opening your course library now...</p>
               </div>
             )}
             {decision === 'declined' && (
