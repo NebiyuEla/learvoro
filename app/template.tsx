@@ -7,7 +7,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setReady(true), 420);
+    const timer = window.setTimeout(() => setReady(true), 1200);
     return () => window.clearTimeout(timer);
   }, []);
 

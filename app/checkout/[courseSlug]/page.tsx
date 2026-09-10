@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { HostedCheckoutDemo } from '@/components/checkout-details-form';
 import { findCourse, formatPrice } from '@/lib/course-data';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
+import { coursePrices, withPrice } from '@/lib/course-pricing';
 
 export async function generateMetadata({
   params,
@@ -24,8 +25,9 @@ export default async function Checkout({
 }) {
   const { courseSlug } = await params;
   const { session } = await searchParams;
-  const course = findCourse(courseSlug);
-  if (!course) redirect('/courses');
+  const baseCourse = findCourse(courseSlug);
+  if (!baseCourse) redirect('/courses');
+  const course = withPrice(baseCourse, await coursePrices());
   await requireChatGPTUser(`/checkout/${course.slug}`);
   const lessonCount = course.sections.reduce(
     (total, section) => total + section.lessons.length,

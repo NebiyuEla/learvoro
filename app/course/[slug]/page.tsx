@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { findCourse, formatPrice } from "@/lib/course-data";
+import { coursePrices, withPrice } from "@/lib/course-pricing";
+export const dynamic = "force-dynamic";
 export default async function CoursePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const course = findCourse(slug);
-  if (!course) redirect("/courses");
+  const baseCourse = findCourse(slug);
+  if (!baseCourse) redirect("/courses");
+  const course = withPrice(baseCourse, await coursePrices());
   const count = course.sections.reduce((n, s) => n + s.lessons.length, 0);
   return (
     <>

@@ -239,9 +239,9 @@ return () => {
   }, [captureId, decision]);
   useEffect(() => {
     if (decision !== 'approved') return;
-    const timer = setTimeout(() => window.location.assign('/my-learning'), 2600);
+    const timer = setTimeout(() => window.location.assign(`/my-learning?payment=paid&course=${encodeURIComponent(courseSlug)}`), 1800);
     return () => clearTimeout(timer);
-  }, [decision]);
+  }, [courseSlug, decision]);
   return (
     <main className="min-h-screen bg-white text-[#1a1f36]">
       <div className="grid min-h-screen bg-white lg:grid-cols-2">
