@@ -28,6 +28,8 @@ type Data = {
   demoCode: string;
 };
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+// Master switch for every interactive control in the synthetic checkout form.
+const CHECKOUT_FORM_ENABLED = true;
 const countries = Array.from({ length: 26 * 26 }, (_, index) => {
   const code = String.fromCharCode(65 + Math.floor(index / 26), 65 + (index % 26));
   return { code, name: regionNames.of(code) ?? code };
@@ -250,6 +252,7 @@ export function HostedCheckoutDemo({
             autoComplete="off"
             className="mx-auto w-full max-w-[500px]"
           >
+            <fieldset disabled={!CHECKOUT_FORM_ENABLED} className="contents">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="font-heading text-2xl font-bold">
@@ -435,6 +438,7 @@ export function HostedCheckoutDemo({
             <p className="mt-4 text-center text-xs leading-5 text-[#87909d]">
               One-time course enrollment · Lifetime access
             </p>
+            </fieldset>
           </form>
         </section>
       </div>
