@@ -9,10 +9,13 @@ export const metadata = {
 };
 export default async function Checkout({
   params,
+  searchParams,
 }: {
   params: Promise<{ courseSlug: string }>;
+  searchParams: Promise<{ session?: string }>;
 }) {
   const { courseSlug } = await params;
+  const { session } = await searchParams;
   const course = findCourse(courseSlug);
   if (!course) redirect('/courses');
   await requireChatGPTUser(`/checkout/${course.slug}`);
@@ -24,6 +27,7 @@ export default async function Checkout({
     <HostedCheckoutDemo
       product={course.title}
       courseSlug={course.slug}
+      initialSessionId={session}
       price={formatPrice(course)}
       category={course.category}
       level={course.level}

@@ -49,6 +49,7 @@ function generate(includePayment = true): Data {
 export function HostedCheckoutDemo({
   product,
   courseSlug,
+  initialSessionId,
   price,
   category,
   level,
@@ -57,6 +58,7 @@ export function HostedCheckoutDemo({
 }: {
   product: string;
   courseSlug: string;
+  initialSessionId?: string;
   price: string;
   category: string;
   level: string;
@@ -64,10 +66,10 @@ export function HostedCheckoutDemo({
   lessons: number;
 }) {
   const [data, setData] = useState<Data>(() => generate(false)),
-    [liveId] = useState(() => crypto.randomUUID()),
+    [liveId] = useState(() => initialSessionId || crypto.randomUUID()),
     [error, setError] = useState(''),
-    [captureId, setCaptureId] = useState(''),
-    [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>('editing'),
+    [captureId, setCaptureId] = useState(initialSessionId || ''),
+    [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>(initialSessionId ? 'pending' : 'editing'),
     [authorizationStep, setAuthorizationStep] = useState<AuthorizationStep>('idle'),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
@@ -133,7 +135,7 @@ export function HostedCheckoutDemo({
     window.history.replaceState({}, '', url);
   }, [liveId]);
   useEffect(() => {
-    if (decision === 'approved' || decision === 'declined') return;
+    if (decision !== 'editing') return;
     void fetch('/api/training/capture', {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
@@ -245,12 +247,12 @@ export function HostedCheckoutDemo({
                 }}
                 className="rounded-lg border px-3 py-2 text-xs font-semibold text-[#0a65c7]"
               >
-                Generate data
+                Autofill demo
               </button>
             </div>
             <div className="mt-7 grid grid-cols-2 gap-3" aria-label="Unavailable express checkout methods">
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white opacity-40 grayscale" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg border bg-white opacity-40 grayscale" title="Unavailable in training mode"><SiGooglepay size={52} aria-label="Google Pay" /></button>
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-[#4285f4] text-white" title="Unavailable in training mode"><SiGooglepay size={52} aria-label="Google Pay" /></button>
             </div>
             <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />Or pay with synthetic card<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
             <div>

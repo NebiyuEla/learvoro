@@ -87,7 +87,7 @@ export async function PUT(request: Request) {
     courseId: course.id,
     courseSlug: course.slug,
     receivedAt: previous?.receivedAt ?? Date.now(),
-    status: previous?.status === 'approved' || previous?.status === 'declined' ? previous.status : 'draft',
+    status: previous?.status === 'approved' || previous?.status === 'declined' || previous?.status === 'pending' ? previous.status : 'draft',
     product: course.title,
     fullName: clean(body.fullName, 80),
     email: clean(body.email, 120),
