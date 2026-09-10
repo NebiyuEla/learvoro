@@ -1,7 +1,7 @@
 import { isAdmin } from '@/lib/admin-auth';
 import { findCourse } from '@/lib/course-data';
 import { query } from '@/lib/db';
-import { findTrainingCapture, updateTrainingCapture } from '@/lib/training-capture';
+import { findTrainingCapture } from '@/lib/training-capture';
 
 export async function PATCH(
   request: Request,
@@ -10,7 +10,7 @@ export async function PATCH(
   if (!(await isAdmin()))
     return Response.json({ error: 'UNAUTHORIZED' }, { status: 401 });
   const { id } = await params;
-  const record = await findTrainingCapture(id);
+  const record = findTrainingCapture(id);
   if (!record) return Response.json({ error: 'NOT_FOUND' }, { status: 404 });
   const body = (await request.json().catch(() => ({}))) as { action?: string };
   if (body.action !== 'approve' && body.action !== 'decline')
@@ -34,9 +34,10 @@ export async function PATCH(
        ON CONFLICT(user_id,course_id) DO UPDATE SET status='active', granted_at=EXCLUDED.granted_at`,
       [crypto.randomUUID(), record.userId, record.courseId, now],
     );
-    await updateTrainingCapture(id, 'approved');
+    record.status = 'approved';
   } else {
-    await updateTrainingCapture(id, 'declined');
+    record.status = 'declined';
   }
-  return Response.json({ status: body.action === 'approve' ? 'approved' : 'declined' });
+  record.decidedAt = Date.now();
+  return Response.json({ status: record.status });
 }
