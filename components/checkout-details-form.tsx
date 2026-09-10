@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import {
   CheckCircle2,
+  CreditCard,
   HelpCircle,
   Loader2,
   LockKeyhole,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 type Props = {
@@ -13,13 +15,16 @@ type Props = {
   email: string;
   fullName: string;
   category: string;
+  price: string;
 };
 export function CheckoutDetailsForm({
   courseSlug,
   email,
   fullName,
   category,
+  price,
 }: Props) {
+  const [showPayment, setShowPayment] = useState(false);
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>(
     'idle',
   );
@@ -53,6 +58,8 @@ export function CheckoutDetailsForm({
       };
       if (response.ok) {
         setState('saved');
+        setShowPayment(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       setError(
@@ -69,6 +76,7 @@ export function CheckoutDetailsForm({
     }
     setState('error');
   }
+  if (showPayment) return <PaymentShell price={price} />;
   return (
     <form
       method="post"
@@ -221,6 +229,59 @@ export function CheckoutDetailsForm({
         .
       </p>
     </form>
+  );
+}
+
+function PaymentShell({ price }: { price: string }) {
+  return (
+    <section className="rounded-xl border bg-white p-7 shadow-sm md:p-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl font-bold">Payment Details</h1>
+          <p className="mt-3 flex items-center gap-2 text-[#657794]">
+            <LockKeyhole size={18} /> Secure card entry
+          </p>
+        </div>
+        <div className="hidden rounded-md border px-3 py-2 text-sm text-[#657794] sm:block">
+          Powered by <b className="text-[#635bff]">stripe</b>
+        </div>
+      </div>
+      <div className="mt-8" aria-label="Card entry preview">
+        <p className="font-semibold">Card information</p>
+        <div className="mt-3 overflow-hidden rounded-lg border border-[#ccd6e2] text-[#8a97a8]">
+          <div className="flex items-center px-5 py-4">
+            <span>1234 5678 9012 3456</span>
+            <CreditCard className="ml-auto text-[#49617d]" size={22} />
+          </div>
+          <div className="grid grid-cols-2 border-t">
+            <span className="border-r px-5 py-4">MM / YY</span>
+            <span className="px-5 py-4">CVC</span>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-[#657794]">
+          Preview only. Connect Stripe Elements here before accepting payments.
+        </p>
+      </div>
+      <div className="mt-7 rounded-lg bg-[#eafaf2] p-4 text-[#08784f]">
+        <div className="flex gap-3">
+          <ShieldCheck />
+          <div>
+            <b>Built for secure payment</b>
+            <p className="mt-1 text-sm">
+              Connect Stripe Elements so sensitive card data goes directly to
+              Stripe.
+            </p>
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        disabled
+        className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white opacity-60"
+      >
+        <LockKeyhole /> Pay {price}
+      </button>
+    </section>
   );
 }
 function Field({

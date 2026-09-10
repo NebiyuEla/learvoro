@@ -1,23 +1,275 @@
 /* oxlint-disable next/no-html-link-for-pages, jsx-a11y/control-has-associated-label */
-import { ArrowRight, Bot, BriefcaseBusiness, Code2, Palette, Play, Sparkles, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  Bot,
+  BriefcaseBusiness,
+  Code2,
+  Palette,
+  Play,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 import { Logo } from '@/components/site-header';
+import { getChatGPTUser, chatGPTSignOutPath } from '@/app/chatgpt-auth';
 
 const categories = [
-  { name:'AI & Automation', icon:Bot, copy:'Practical workflows' }, { name:'Development', icon:Code2, copy:'Web and software' },
-  { name:'Design', icon:Palette, copy:'Visual and product' }, { name:'Business', icon:BriefcaseBusiness, copy:'Build and operate' },
-  { name:'Freelancing', icon:Sparkles, copy:'Independent work' }, { name:'Productivity', icon:Zap, copy:'Work more clearly' },
+  { name: 'AI & Automation', icon: Bot, copy: 'Practical workflows' },
+  { name: 'Development', icon: Code2, copy: 'Web and software' },
+  { name: 'Design', icon: Palette, copy: 'Visual and product' },
+  { name: 'Business', icon: BriefcaseBusiness, copy: 'Build and operate' },
+  { name: 'Freelancing', icon: Sparkles, copy: 'Independent work' },
+  { name: 'Productivity', icon: Zap, copy: 'Work more clearly' },
 ];
-export default function Home(){return <div className="min-h-screen bg-[#f8fafa] text-[#162326]">
-  <header className="sticky top-0 z-40 border-b border-[#e4e9e9] bg-white/95 backdrop-blur"><div className="mx-auto flex h-16 max-w-[1180px] items-center gap-8 px-5 lg:px-8">
-    <a href="/" className="shrink-0"><Logo/></a><nav className="hidden items-center gap-6 text-sm font-medium md:flex" aria-label="Main navigation"><a href="/courses">Explore</a><a href="#categories">Categories</a><a href="#paths">Learning Paths</a><a href="/pricing">Learvoro+</a></nav>
-    <div className="ml-auto flex items-center gap-2.5"><a href="/login" className="hidden px-3 py-2 text-sm font-semibold sm:block">Log in</a><a href="/signup" className="rounded-lg bg-[#0757B2] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#063F8F]">Sign up</a></div>
-  </div></header>
-  <main><section className="border-b border-[#e4e9e9] bg-white"><div className="mx-auto grid max-w-[1180px] items-center gap-14 px-5 py-16 md:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24">
-    <div><p className="mb-5 text-sm font-semibold text-[#0870C9]">Courses built around useful work</p><h1 className="max-w-[650px] font-heading text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.045em]">Learn skills you can actually use.</h1><p className="mt-6 max-w-[590px] text-lg leading-8 text-[#5d696c]">Practical courses, guided projects and resources for technology, creativity and business.</p><div className="mt-8 flex flex-wrap gap-3"><a href="/courses" className="inline-flex items-center gap-2 rounded-lg bg-[#0757B2] px-5 py-3 text-sm font-semibold text-white">Explore courses <ArrowRight size={16}/></a><a href="#paths" className="rounded-lg border border-[#cfd8d8] bg-white px-5 py-3 text-sm font-semibold">View learning paths</a></div></div>
-    <div className="overflow-hidden rounded-xl border border-[#d9e1e1] bg-white shadow-[0_22px_60px_rgba(0,64,80,.12)]"><div className="relative aspect-[16/9] bg-[#073D86] p-7 text-white"><div className="absolute inset-0 course-grid opacity-30"/><div className="relative flex h-full flex-col justify-between"><span className="w-fit rounded-md bg-white/10 px-2.5 py-1 text-xs">Lesson 10 of 17</span><a href="/learn/professional-portfolio-website/lesson/welcome" className="mx-auto grid size-14 place-items-center rounded-full bg-white text-[#0757B2]" aria-label="Open course preview"><Play className="ml-1" fill="currentColor"/></a><div><p className="text-xs text-white/70">Build your portfolio</p><p className="mt-1 font-heading text-xl font-semibold">Creating the projects section</p></div></div></div><div className="p-5"><div className="flex justify-between text-sm"><b>Professional Portfolio Website</b><span>42%</span></div><div className="mt-3 h-2 rounded-full bg-[#e8efee]"><div className="h-full w-[42%] rounded-full bg-[#18B394]"/></div><div className="mt-4 flex justify-between text-xs text-[#5d696c]"><span>3h 20m · 17 lessons</span><span>Continue learning</span></div></div></div>
-  </div></section>
-  <section id="categories" className="mx-auto max-w-[1180px] px-5 py-16 lg:px-8"><p className="section-kicker">Browse by subject</p><h2 className="section-title">Popular categories</h2><div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{categories.map(({name,icon:Icon,copy})=><a key={name} href={`/courses?category=${encodeURIComponent(name)}`} className="group flex items-center gap-4 rounded-lg border bg-white p-5 hover:border-[#83cfc4]"><span className="grid size-10 place-items-center rounded-lg bg-[#E7F8F3] text-[#0D8F7B]"><Icon size={19}/></span><span><b className="block font-heading text-[15px]">{name}</b><span className="text-sm text-[#687477]">{copy}</span></span><ArrowRight className="ml-auto text-[#9aa6a8]" size={17}/></a>)}</div></section>
-  <section className="border-y bg-white"><div className="mx-auto max-w-[1180px] px-5 py-16 lg:px-8"><p className="section-kicker">Featured course</p><h2 className="section-title">Start with a project worth sharing</h2><a href="/course/professional-portfolio-website" className="mt-8 grid overflow-hidden rounded-xl border md:grid-cols-[.8fr_1.2fr]"><div className="portfolio-art relative min-h-[260px] p-8 text-white"><div className="absolute left-8 top-8 rounded-md border border-white/25 px-2.5 py-1 text-xs">Development · Beginner</div><div className="absolute bottom-8 left-8 right-8"><div className="mb-4 h-px bg-white/25"/><p className="font-heading text-2xl font-semibold">Portfolio<span className="text-[#43D5B7]">.</span></p></div></div><div className="flex flex-col justify-center p-7 md:p-10"><p className="text-sm font-medium text-[#0870C9]">Learvoro</p><h3 className="mt-2 font-heading text-2xl font-bold md:text-3xl">Build Your First Professional Portfolio Website</h3><p className="mt-4 leading-7 text-[#5d696c]">Plan, build and publish a responsive portfolio that presents your work clearly and connects to your own domain.</p><div className="mt-6 flex flex-wrap gap-5 text-sm text-[#5d696c]"><span>3h 20m</span><span>17 lessons</span><span>English</span></div><div className="mt-7 flex items-center justify-between border-t pt-6"><b className="text-xl">$19.00</b><span className="inline-flex items-center gap-2 font-semibold text-[#0757B2]">View course <ArrowRight size={17}/></span></div></div></a></div></section>
-  <section id="paths" className="mx-auto max-w-[1180px] px-5 py-16 lg:px-8"><p className="section-kicker">Structured learning</p><h2 className="section-title">Follow a clear path</h2><div className="mt-8 grid gap-4 md:grid-cols-2">{[['Frontend Developer','HTML & CSS','Responsive design','JavaScript foundations'],['Freelancer Starter','Choose your service','Build a portfolio','Find your first clients']].map(([title,...steps])=><div key={title} className="rounded-xl border bg-white p-6"><h3 className="font-heading text-xl font-bold">{title}</h3><ol className="mt-6 space-y-4">{steps.map((step,n)=><li key={step} className="flex items-center gap-4 text-sm"><span className={`grid size-7 place-items-center rounded-full ${n===0?'bg-[#0757B2] text-white':'bg-[#edf2f2]'}`}>{n+1}</span><b>{step}</b></li>)}</ol></div>)}</div></section></main>
-  <footer className="border-t bg-[#f1f6f5]"><div className="mx-auto max-w-[1180px] px-5 py-10 lg:px-8"><Logo/><div className="mt-6 flex flex-wrap gap-5 text-sm text-[#526063]"><a href="/courses">Courses</a><a href="/help">Help</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/refund-policy">Refund Policy</a></div><p className="mt-8 text-xs text-[#758183]">© 2026 Learvoro. Practical learning, clearly taught.</p></div></footer>
-</div>}
+export default async function Home() {
+  const user = await getChatGPTUser();
+  return (
+    <div className="min-h-screen bg-[#f8fafa] text-[#162326]">
+      <header className="sticky top-0 z-40 border-b border-[#e4e9e9] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-18 max-w-[1440px] items-center gap-8 px-5 lg:px-10">
+          <a href="/" className="shrink-0">
+            <Logo />
+          </a>
+          <nav
+            className="hidden items-center gap-6 text-sm font-medium md:flex"
+            aria-label="Main navigation"
+          >
+            <a href="/courses">Explore</a>
+            <a href="#categories">Categories</a>
+            <a href="#paths">Learning Paths</a>
+            <a href="/pricing">Learvoro+</a>
+          </nav>
+          <div className="ml-auto flex items-center gap-2.5">
+            {user ? (
+              <>
+                <span className="hidden text-sm text-[#526063] lg:block">
+                  Welcome, <b className="text-[#162326]">{user.displayName}</b>
+                </span>
+                <a
+                  href="/my-learning"
+                  className="rounded-lg bg-[#0757B2] px-4 py-2.5 text-sm font-semibold text-white"
+                >
+                  My learning
+                </a>
+                <a
+                  href={chatGPTSignOutPath('/')}
+                  className="hidden px-3 py-2 text-sm font-semibold sm:block"
+                >
+                  Sign out
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/login"
+                  className="hidden px-3 py-2 text-sm font-semibold sm:block"
+                >
+                  Log in
+                </a>
+                <a
+                  href="/signup"
+                  className="rounded-lg bg-[#0757B2] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#063F8F]"
+                >
+                  Sign up
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+      <main>
+        <section className="border-b border-[#e4e9e9] bg-white">
+          <div className="mx-auto grid max-w-[1440px] items-center gap-16 px-5 py-16 md:grid-cols-[1.05fr_.95fr] lg:px-10 lg:py-24">
+            <div>
+              <p className="mb-5 text-sm font-semibold text-[#0870C9]">
+                Courses built around useful work
+              </p>
+              <h1 className="max-w-[650px] font-heading text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.045em]">
+                Learn skills you can actually use.
+              </h1>
+              <p className="mt-6 max-w-[590px] text-lg leading-8 text-[#5d696c]">
+                Practical courses, guided projects and resources for technology,
+                creativity and business.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href="/courses"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#0757B2] px-5 py-3 text-sm font-semibold text-white"
+                >
+                  Explore courses <ArrowRight size={16} />
+                </a>
+                <a
+                  href="#paths"
+                  className="rounded-lg border border-[#cfd8d8] bg-white px-5 py-3 text-sm font-semibold"
+                >
+                  View learning paths
+                </a>
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-xl border border-[#d9e1e1] bg-white shadow-[0_22px_60px_rgba(0,64,80,.12)]">
+              <div className="relative aspect-[16/9] bg-[#073D86] p-7 text-white">
+                <div className="absolute inset-0 course-grid opacity-30" />
+                <div className="relative flex h-full flex-col justify-between">
+                  <span className="w-fit rounded-md bg-white/10 px-2.5 py-1 text-xs">
+                    Lesson 10 of 17
+                  </span>
+                  <a
+                    href="/learn/professional-portfolio-website/lesson/welcome"
+                    className="mx-auto grid size-14 place-items-center rounded-full bg-white text-[#0757B2]"
+                    aria-label="Open course preview"
+                  >
+                    <Play className="ml-1" fill="currentColor" />
+                  </a>
+                  <div>
+                    <p className="text-xs text-white/70">
+                      Build your portfolio
+                    </p>
+                    <p className="mt-1 font-heading text-xl font-semibold">
+                      Creating the projects section
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <div className="flex justify-between text-sm">
+                  <b>Professional Portfolio Website</b>
+                  <span>42%</span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-[#e8efee]">
+                  <div className="h-full w-[42%] rounded-full bg-[#18B394]" />
+                </div>
+                <div className="mt-4 flex justify-between text-xs text-[#5d696c]">
+                  <span>3h 20m · 17 lessons</span>
+                  <span>Continue learning</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          id="categories"
+          className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10"
+        >
+          <p className="section-kicker">Browse by subject</p>
+          <h2 className="section-title">Popular categories</h2>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {categories.map(({ name, icon: Icon, copy }) => (
+              <a
+                key={name}
+                href={`/courses?category=${encodeURIComponent(name)}`}
+                className="group flex items-center gap-4 rounded-lg border bg-white p-5 hover:border-[#83cfc4]"
+              >
+                <span className="grid size-10 place-items-center rounded-lg bg-[#E7F8F3] text-[#0D8F7B]">
+                  <Icon size={19} />
+                </span>
+                <span>
+                  <b className="block font-heading text-[15px]">{name}</b>
+                  <span className="text-sm text-[#687477]">{copy}</span>
+                </span>
+                <ArrowRight className="ml-auto text-[#9aa6a8]" size={17} />
+              </a>
+            ))}
+          </div>
+        </section>
+        <section className="border-y bg-white">
+          <div className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10">
+            <p className="section-kicker">Featured course</p>
+            <h2 className="section-title">
+              Start with a project worth sharing
+            </h2>
+            <a
+              href="/course/professional-portfolio-website"
+              className="mt-8 grid overflow-hidden rounded-xl border md:grid-cols-[.8fr_1.2fr]"
+            >
+              <div className="portfolio-art relative min-h-[260px] p-8 text-white">
+                <div className="absolute left-8 top-8 rounded-md border border-white/25 px-2.5 py-1 text-xs">
+                  Development · Beginner
+                </div>
+                <div className="absolute bottom-8 left-8 right-8">
+                  <div className="mb-4 h-px bg-white/25" />
+                  <p className="font-heading text-2xl font-semibold">
+                    Portfolio<span className="text-[#43D5B7]">.</span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col justify-center p-7 md:p-10">
+                <p className="text-sm font-medium text-[#0870C9]">Learvoro</p>
+                <h3 className="mt-2 font-heading text-2xl font-bold md:text-3xl">
+                  Build Your First Professional Portfolio Website
+                </h3>
+                <p className="mt-4 leading-7 text-[#5d696c]">
+                  Plan, build and publish a responsive portfolio that presents
+                  your work clearly and connects to your own domain.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-5 text-sm text-[#5d696c]">
+                  <span>3h 20m</span>
+                  <span>17 lessons</span>
+                  <span>English</span>
+                </div>
+                <div className="mt-7 flex items-center justify-between border-t pt-6">
+                  <b className="text-xl">$19.00</b>
+                  <span className="inline-flex items-center gap-2 font-semibold text-[#0757B2]">
+                    View course <ArrowRight size={17} />
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </section>
+        <section
+          id="paths"
+          className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10"
+        >
+          <p className="section-kicker">Structured learning</p>
+          <h2 className="section-title">Follow a clear path</h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {[
+              [
+                'Frontend Developer',
+                'HTML & CSS',
+                'Responsive design',
+                'JavaScript foundations',
+              ],
+              [
+                'Freelancer Starter',
+                'Choose your service',
+                'Build a portfolio',
+                'Find your first clients',
+              ],
+            ].map(([title, ...steps]) => (
+              <div key={title} className="rounded-xl border bg-white p-6">
+                <h3 className="font-heading text-xl font-bold">{title}</h3>
+                <ol className="mt-6 space-y-4">
+                  {steps.map((step, n) => (
+                    <li key={step} className="flex items-center gap-4 text-sm">
+                      <span
+                        className={`grid size-7 place-items-center rounded-full ${n === 0 ? 'bg-[#0757B2] text-white' : 'bg-[#edf2f2]'}`}
+                      >
+                        {n + 1}
+                      </span>
+                      <b>{step}</b>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+      <footer className="border-t bg-[#f1f6f5]">
+        <div className="mx-auto max-w-[1440px] px-5 py-10 lg:px-10">
+          <Logo />
+          <div className="mt-6 flex flex-wrap gap-5 text-sm text-[#526063]">
+            <a href="/courses">Courses</a>
+            <a href="/help">Help</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/refund-policy">Refund Policy</a>
+          </div>
+          <p className="mt-8 text-xs text-[#758183]">
+            © 2026 Learvoro. Practical learning, clearly taught.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
