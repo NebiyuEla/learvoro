@@ -257,21 +257,7 @@ export function HostedCheckoutDemo({
                 <h2 className="font-heading text-2xl font-bold">
                   Complete your enrollment
                 </h2>
-                <p className="mt-2 text-sm text-[#697386]">
-                  All values below are synthetic training data.
-                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setData(generate());
-                  setDecision('editing');
-                  setError('');
-                }}
-                className="rounded-lg border px-3 py-2 text-xs font-semibold text-[#0a65c7]"
-              >
-                Autofill demo
-              </button>
             </div>
             <div className="mt-7 grid grid-cols-2 gap-3" aria-label="Unavailable express checkout methods">
               <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
@@ -302,7 +288,7 @@ export function HostedCheckoutDemo({
               </Field>
             </div>
             <div className="mt-7">
-              <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]">University demo · synthetic only</span></div>
+              <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]"></span></div>
               <div className="mt-3 rounded-xl border p-4 shadow-sm">
                 <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
                 <p className="mb-1 text-xs font-medium text-[#596780]">Card information</p>
