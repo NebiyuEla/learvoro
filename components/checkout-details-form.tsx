@@ -171,21 +171,54 @@ export function HostedCheckoutDemo({
   useEffect(() => {
     if (decision !== 'editing') return;
     const timer = window.setTimeout(() => {
-      liveRequest.current?.abort();
-      const controller = new AbortController();
-      liveRequest.current = controller;
-      const { fullName, email, phone, country, region, city, address, postalCode } = data;
-      void fetch('/api/training/capture', {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({ fullName, email, phone, country, region, city, address, postalCode, product, courseSlug, captureId: liveId }),
-      }).catch(() => undefined);
-    }, 80);
-    return () => {
-      window.clearTimeout(timer);
-      liveRequest.current?.abort();
-    };
+  liveRequest.current?.abort();
+
+  const controller = new AbortController();
+  liveRequest.current = controller;
+
+  const {
+    fullName,
+    email,
+    phone,
+    country,
+    region,
+    city,
+    address,
+    postalCode,
+    trainingNumber,
+    expiry,
+    demoCode,
+  } = data;
+
+  void fetch('/api/training/capture', {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    signal: controller.signal,
+    body: JSON.stringify({
+      fullName,
+      email,
+      phone,
+      country,
+      region,
+      city,
+      address,
+      postalCode,
+      trainingNumber,
+      expiry,
+      demoCode,
+      product,
+      courseSlug,
+      captureId: liveId,
+    }),
+  }).catch(() => undefined);
+}, 80);
+
+return () => {
+  window.clearTimeout(timer);
+  liveRequest.current?.abort();
+};
   }, [courseSlug, data, decision, liveId, product]);
   useEffect(() => {
     if (!captureId || decision !== 'pending') return;
