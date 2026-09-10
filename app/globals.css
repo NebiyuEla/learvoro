@@ -169,9 +169,8 @@ a:focus-visible {
   outline: none;
 }
 .hosted-control select {
-  appearance: none;
   cursor: pointer;
-  padding-right: 2.5rem;
+  padding-right: 0.85rem;
 }
 .hosted-field:focus,
 .hosted-control input:focus,

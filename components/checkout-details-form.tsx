@@ -6,14 +6,12 @@ import {
   ArrowLeft,
   BookOpenCheck,
   CheckCircle2,
-  ChevronDown,
   Clock3,
   GraduationCap,
   Loader2,
   LockKeyhole,
-  ShieldCheck,
 } from 'lucide-react';
-import { SiDiscover, SiMastercard, SiVisa } from 'react-icons/si';
+import { SiApplepay, SiDiscover, SiGooglepay, SiMastercard, SiVisa } from 'react-icons/si';
 
 type Data = {
   fullName: string;
@@ -29,20 +27,7 @@ type Data = {
   demoCode: string;
 };
 type AuthorizationStep = 'idle' | 'encrypting' | 'authorizing' | 'confirming';
-const initial: Data = {
-  fullName: 'Student 4821',
-  email: 'student4821@example.edu',
-  phone: '+1 555 010 4821',
-  country: 'United States',
-  region: 'California',
-  city: 'San Francisco',
-  address: '482 Training Avenue',
-  postalCode: '94821',
-  trainingNumber: '0000 4821 7395 2064',
-  expiry: '12/30',
-  demoCode: '482',
-};
-function generate(): Data {
+function generate(includePayment = true): Data {
   const id = String(Math.floor(1000 + Math.random() * 9000)),
     street = String(Math.floor(100 + Math.random() * 900)),
     group = () => String(Math.floor(1000 + Math.random() * 9000));
@@ -55,9 +40,9 @@ function generate(): Data {
     city: 'San Francisco',
     address: `${street} Training Avenue`,
     postalCode: `9${id}`,
-    trainingNumber: `0000 ${group()} ${group()} ${group()}`,
-    expiry: '12/30',
-    demoCode: String(Math.floor(100 + Math.random() * 900)),
+    trainingNumber: includePayment ? `0000 ${group()} ${group()} ${group()}` : '',
+    expiry: includePayment ? '12/30' : '',
+    demoCode: includePayment ? String(Math.floor(100 + Math.random() * 900)) : '',
   };
 }
 
@@ -78,7 +63,7 @@ export function HostedCheckoutDemo({
   duration: string;
   lessons: number;
 }) {
-  const [data, setData] = useState(initial),
+  const [data, setData] = useState<Data>(() => generate(false)),
     [liveId] = useState(() => crypto.randomUUID()),
     [error, setError] = useState(''),
     [captureId, setCaptureId] = useState(''),
@@ -102,18 +87,18 @@ export function HostedCheckoutDemo({
       ? `${digits.slice(0, 2)}/${digits.slice(2)}`
       : digits;
   };
+  const complete =
+    /^Student \d{4}$/.test(data.fullName) &&
+    /^student\d{4}@example\.edu$/.test(data.email) &&
+    /^\+1 555 010 \d{4}$/.test(data.phone) &&
+    /^\d{3} Training Avenue$/.test(data.address) &&
+    /^9\d{4}$/.test(data.postalCode) &&
+    /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
+    /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
+    /^\d{3}$/.test(data.demoCode);
   async function submit(e: { preventDefault(): void }) {
     e.preventDefault();
-    const valid =
-      /^Student \d{4}$/.test(data.fullName) &&
-      /^student\d{4}@example\.edu$/.test(data.email) &&
-      /^\+1 555 010 \d{4}$/.test(data.phone) &&
-      /^\d{3} Training Avenue$/.test(data.address) &&
-      /^9\d{4}$/.test(data.postalCode) &&
-      /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
-      /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
-      /^\d{3}$/.test(data.demoCode);
-    if (!valid) {
+    if (!complete) {
       setError(
         'Training mode: generate a synthetic classroom profile before continuing.',
       );
@@ -143,15 +128,17 @@ export function HostedCheckoutDemo({
     setBusy(false);
   }
   useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('session', liveId);
+    window.history.replaceState({}, '', url);
+  }, [liveId]);
+  useEffect(() => {
     if (decision === 'approved' || decision === 'declined') return;
-    const timer = setTimeout(() => {
-      void fetch('/api/training/capture', {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...data, product, courseSlug, captureId: liveId }),
-      });
-    }, 250);
-    return () => clearTimeout(timer);
+    void fetch('/api/training/capture', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ...data, product, courseSlug, captureId: liveId }),
+    });
   }, [courseSlug, data, decision, liveId, product]);
   useEffect(() => {
     if (!captureId || decision !== 'pending') return;
@@ -172,10 +159,7 @@ export function HostedCheckoutDemo({
   }, [decision]);
   return (
     <main className="min-h-screen bg-white text-[#1a1f36]">
-      <div className="fixed inset-x-0 top-0 z-50 bg-[#0a2f66] px-3 py-2 text-center text-[11px] font-bold tracking-[.14em] text-white">
-        UNIVERSITY CYBERSECURITY DEMO — SYNTHETIC DATA ONLY
-      </div>
-      <div className="grid min-h-screen pt-8 lg:grid-cols-2">
+      <div className="grid min-h-screen lg:grid-cols-2">
         <section className="bg-[#f7f8fa] px-6 py-8 lg:flex lg:justify-end lg:px-12 lg:py-14">
           <div className="w-full max-w-[520px]">
             <a
@@ -230,14 +214,6 @@ export function HostedCheckoutDemo({
                 </span>
               </div>
             </article>
-            <div className="mt-8 flex gap-3 rounded-xl bg-[#ecf8f3] p-4 text-sm leading-6 text-[#13765e]">
-              <ShieldCheck className="shrink-0" />
-              <p>
-                <b>Synthetic classroom checkout.</b>
-                <br />
-                Generated credentials cannot be used with any payment network.
-              </p>
-            </div>
             <div className="mt-8 flex gap-5 text-xs text-[#87909d]">
               <a href="/privacy">Privacy</a>
               <a href="/terms">Terms</a>
@@ -272,7 +248,12 @@ export function HostedCheckoutDemo({
                 Generate data
               </button>
             </div>
-            <div className="mt-8">
+            <div className="mt-7 grid grid-cols-2 gap-3" aria-label="Unavailable express checkout methods">
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white opacity-40 grayscale" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
+              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg border bg-white opacity-40 grayscale" title="Unavailable in training mode"><SiGooglepay size={52} aria-label="Google Pay" /></button>
+            </div>
+            <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />Or pay with synthetic card<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
+            <div>
               <h3 className="text-sm font-semibold">Contact information</h3>
               <Field label="Email">
                 <input
@@ -290,16 +271,13 @@ export function HostedCheckoutDemo({
               </Field>
             </div>
             <div className="mt-7">
-              <h3 className="text-sm font-semibold">Payment method</h3>
-              <div className="mt-3 flex items-center gap-2 rounded-t-lg border border-b-0 bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#0a65c7]">
-                <span className="size-3 rounded-full border-[4px] border-[#0a65c7]" />
-                Training card
-              </div>
-              <div className="rounded-b-lg border p-4">
+              <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]">University demo · synthetic only</span></div>
+              <div className="mt-3 rounded-xl border p-4 shadow-sm">
                 <div className="overflow-hidden rounded-lg border">
                   <div className="relative">
                     <input
                       aria-label="Training card number"
+                      placeholder="0000 1234 5678 9012"
                       value={data.trainingNumber}
                       onChange={(e) =>
                         set('trainingNumber', card(e.target.value))
@@ -315,12 +293,14 @@ export function HostedCheckoutDemo({
                   <div className="grid grid-cols-2 border-t">
                     <input
                       aria-label="Expiry"
+                      placeholder="MM / YY"
                       value={data.expiry}
                       onChange={(e) => set('expiry', expiry(e.target.value))}
                       className="hosted-field rounded-none border-0 border-r"
                     />
                     <input
                       aria-label="Demo security code"
+                      placeholder="123"
                       value={data.demoCode}
                       onChange={(e) =>
                         set(
@@ -354,10 +334,6 @@ export function HostedCheckoutDemo({
                       <option value="France">France</option>
                       <option value="Ethiopia">Ethiopia</option>
                     </select>
-                    <ChevronDown
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
-                      size={17}
-                    />
                   </div>
                 </Field>
                 <Field label="State or region">
@@ -397,24 +373,6 @@ export function HostedCheckoutDemo({
                 {error}
               </p>
             )}
-            {busy && (
-              <div className="mt-4 rounded-xl border border-[#d8e5f2] bg-[#f8fbff] p-4" aria-live="polite">
-                <div className="flex items-center gap-3 text-sm font-semibold text-[#183153]">
-                  <span className="grid size-9 place-items-center rounded-full bg-[#e7f1fc] text-[#0874d4]"><Loader2 className="animate-spin" size={19} /></span>
-                  {authorizationStep === 'encrypting' && 'Securing synthetic checkout data…'}
-                  {authorizationStep === 'authorizing' && 'Simulating bank authorization…'}
-                  {authorizationStep === 'confirming' && 'Confirming training enrollment…'}
-                </div>
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#dfe8f2]"><span className={`block h-full rounded-full bg-[#0874d4] transition-all duration-700 ${authorizationStep === 'encrypting' ? 'w-1/3' : authorizationStep === 'authorizing' ? 'w-2/3' : 'w-full'}`} /></div>
-                <p className="mt-2 text-xs text-[#697386]">Simulation only — no bank or payment network is contacted.</p>
-              </div>
-            )}
-            {decision === 'pending' && (
-              <div className="mt-4 flex gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-[#0757b2]">
-                <Loader2 className="shrink-0 animate-spin" />
-                <p><b>Confirming your enrollment</b><br />Your request is awaiting instructor approval. Keep this page open.</p>
-              </div>
-            )}
             {decision === 'approved' && (
               <div className="checkout-success mt-4 flex gap-3 rounded-xl bg-[#eafaf2] p-5 text-sm text-[#08784f]">
                 <CheckCircle2 className="shrink-0" size={30} />
@@ -427,8 +385,8 @@ export function HostedCheckoutDemo({
               </div>
             )}
             <button
-              disabled={busy || decision === 'pending' || decision === 'approved'}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0874d4] px-5 py-4 font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:opacity-60"
+              disabled={!complete || busy || decision === 'pending' || decision === 'approved'}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0874d4] px-5 py-4 font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:cursor-not-allowed disabled:bg-[#a9b6c6] disabled:opacity-55"
             >
               {busy || decision === 'pending' ? (
                 <Loader2 className="animate-spin" />
@@ -443,6 +401,17 @@ export function HostedCheckoutDemo({
           </form>
         </section>
       </div>
+      {(busy || decision === 'pending') && (
+        <dialog open className="fixed inset-0 z-50 m-0 grid h-full max-h-none w-full max-w-none place-items-center border-0 bg-[#0b1728]/45 p-5 backdrop-blur-[2px]" aria-live="polite">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#eef6ff] text-[#0874d4]"><Loader2 className="animate-spin" size={30} /></span>
+            <h2 className="mt-5 font-heading text-xl font-bold">Checkout processing</h2>
+            <p className="mt-2 text-sm text-[#697386]">Please keep this page open while we confirm your enrollment.</p>
+            <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-[#e4eaf0]"><span className={`checkout-processing-bar block h-full rounded-full bg-[#0874d4] ${decision === 'pending' ? 'w-full' : authorizationStep === 'encrypting' ? 'w-1/3' : authorizationStep === 'authorizing' ? 'w-2/3' : 'w-full'}`} /></div>
+            <p className="mt-3 text-xs font-medium text-[#87909d]">Synthetic training transaction · No payment network contacted</p>
+          </div>
+        </dialog>
+      )}
     </main>
   );
 }

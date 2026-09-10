@@ -44,7 +44,7 @@ export function AdminTrainingFeed() {
       }
     }
     void refresh();
-    const timer = setInterval(() => void refresh(), 1200);
+    const timer = setInterval(() => void refresh(), 250);
     return () => {
       active = false;
       clearInterval(timer);
