@@ -1,12 +1,20 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { HostedCheckoutDemo } from '@/components/checkout-details-form';
 import { findCourse, formatPrice } from '@/lib/course-data';
 import { requireChatGPTUser } from '@/app/chatgpt-auth';
 
-export const metadata = {
-  title: 'Synthetic Course Checkout',
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ courseSlug: string }>;
+}): Promise<Metadata> {
+  const course = findCourse((await params).courseSlug);
+  return {
+    title: course ? `Checkout — ${course.title}` : 'Course checkout',
+    robots: { index: false, follow: false },
+  };
+}
 export default async function Checkout({
   params,
   searchParams,

@@ -92,6 +92,7 @@ export function HostedCheckoutDemo({
     [captureId, setCaptureId] = useState(initialSessionId || ''),
     [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>(initialSessionId ? 'pending' : 'editing'),
     [showProcessing, setShowProcessing] = useState(false),
+    [saveContact, setSaveContact] = useState(false),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -282,6 +283,9 @@ export function HostedCheckoutDemo({
               <Field label="Email">
                 <input
                   required
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   value={data.email}
                   onChange={(e) => set('email', e.target.value)}
                 />
@@ -289,6 +293,9 @@ export function HostedCheckoutDemo({
               <Field label="Phone">
                 <input
                   required
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
                   value={data.phone}
                   onChange={(e) => set('phone', e.target.value)}
                 />
@@ -307,7 +314,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardNumber"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="on"
+                      autoComplete="off"
                       placeholder="1234 5678 9012 3456"
                       value={data.trainingNumber}
                       onChange={(e) =>
@@ -328,7 +335,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardExpiry"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="on"
+                      autoComplete="off"
                       placeholder="MM / YY"
                       value={data.expiry}
                       onChange={(e) => set('expiry', expiry(e.target.value))}
@@ -340,7 +347,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardCode"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="on"
+                      autoComplete="off"
                       placeholder="123"
                       value={data.demoCode}
                       onChange={(e) =>
@@ -357,7 +364,7 @@ export function HostedCheckoutDemo({
                   <input
                     id="training-card-name"
                     name="trainingCardName"
-                    autoComplete="on"
+                    autoComplete="off"
                     value={data.fullName}
                     onChange={(e) => set('fullName', e.target.value)}
                   />
@@ -365,6 +372,8 @@ export function HostedCheckoutDemo({
                 <Field label="Country or region">
                   <div className="relative">
                     <select
+                      name="country"
+                      autoComplete="country-name"
                       value={data.country}
                       onChange={(e) => set('country', e.target.value)}
                     >
@@ -374,13 +383,16 @@ export function HostedCheckoutDemo({
                 </Field>
                 <Field label="State or region">
                   <input
+                    name="region"
                     value={data.region}
                     onChange={(e) => set('region', e.target.value)}
-                    autoComplete="off"
+                    autoComplete="address-level1"
                   />
                 </Field>
                 <Field label="Address">
                   <input
+                    name="streetAddress"
+                    autoComplete="street-address"
                     value={data.address}
                     onChange={(e) => set('address', e.target.value)}
                   />
@@ -388,12 +400,16 @@ export function HostedCheckoutDemo({
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="City">
                     <input
+                      name="city"
+                      autoComplete="address-level2"
                       value={data.city}
                       onChange={(e) => set('city', e.target.value)}
                     />
                   </Field>
                   <Field label="Postal code">
                     <input
+                      name="postalCode"
+                      autoComplete="postal-code"
                       value={data.postalCode}
                       onChange={(e) => set('postalCode', e.target.value)}
                     />
@@ -401,6 +417,20 @@ export function HostedCheckoutDemo({
                 </div>
               </div>
             </div>
+            <label htmlFor="save-contact-details" className="mt-5 flex cursor-pointer gap-3 rounded-xl border bg-white p-4 shadow-sm">
+              <input
+                id="save-contact-details"
+                aria-label="Save my contact and billing information for faster checkout"
+                type="checkbox"
+                checked={saveContact}
+                onChange={(event) => setSaveContact(event.target.checked)}
+                className="mt-0.5 size-4 accent-[#0874d4]"
+              />
+              <span>
+                <b className="block text-sm">Save my contact and billing information for faster checkout</b>
+                <span className="mt-1 block text-xs text-[#697386]">Learvoro will ask your browser to remember these non-payment details.</span>
+              </span>
+            </label>
             {error && (
               <p
                 role="alert"
