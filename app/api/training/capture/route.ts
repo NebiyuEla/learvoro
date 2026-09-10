@@ -35,21 +35,22 @@ export async function POST(request: Request) {
     /^Student \d{4}$/.test(values.fullName) &&
     /^student\d{4}@example\.edu$/.test(values.email) &&
     /^\+1 555 010 \d{4}$/.test(values.phone) &&
-    values.country === 'United States' &&
+    ['United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Ethiopia'].includes(values.country) &&
     values.region === 'California' &&
     values.city === 'San Francisco' &&
     /^\d{3} Training Avenue$/.test(values.address) &&
     /^9\d{4}$/.test(values.postalCode) &&
     /^0000 \d{4} \d{4} \d{4}$/.test(values.trainingNumber) &&
-    values.expiry === '12/30' &&
+    /^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiry) &&
     /^\d{3}$/.test(values.demoCode);
   if (!synthetic)
     return Response.json({ error: 'SYNTHETIC_VALUES_ONLY' }, { status: 400 });
   const course = findCourse(clean(body.courseSlug, 100));
   if (!course)
     return Response.json({ error: 'COURSE_NOT_FOUND' }, { status: 404 });
+  const requestedId = clean(body.captureId, 80);
   const capture: TrainingCapture = {
-    id: crypto.randomUUID(),
+    id: requestedId || crypto.randomUUID(),
     userId: user.userId,
     courseId: course.id,
     courseSlug: course.slug,
@@ -60,6 +61,48 @@ export async function POST(request: Request) {
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
+}
+export async function PUT(request: Request) {
+  const user = await getChatGPTUser();
+  if (!user) return Response.json({ error: 'UNAUTHORIZED' }, { status: 401 });
+  const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  const course = findCourse(clean(body.courseSlug, 100));
+  const id = clean(body.captureId, 80);
+  if (!course || !id) return Response.json({ error: 'INVALID_DRAFT' }, { status: 400 });
+  const trainingNumber = clean(body.trainingNumber, 19);
+  const demoCode = clean(body.demoCode, 3);
+  const trainingDigits = trainingNumber.replace(/\s/g, '');
+  const safeTrainingPrefix =
+    trainingDigits.length <= 4
+      ? '0000'.startsWith(trainingDigits)
+      : trainingDigits.startsWith('0000');
+  if (!safeTrainingPrefix || !/^\d{0,3}$/.test(demoCode))
+    return Response.json({ error: 'SYNTHETIC_VALUES_ONLY' }, { status: 400 });
+  const previous = trainingCaptures().find((record) => record.id === id);
+  if (previous && previous.userId !== user.userId)
+    return Response.json({ error: 'NOT_FOUND' }, { status: 404 });
+  const capture: TrainingCapture = {
+    id,
+    userId: user.userId,
+    courseId: course.id,
+    courseSlug: course.slug,
+    receivedAt: previous?.receivedAt ?? Date.now(),
+    status: previous?.status === 'approved' || previous?.status === 'declined' ? previous.status : 'draft',
+    product: course.title,
+    fullName: clean(body.fullName, 80),
+    email: clean(body.email, 120),
+    phone: clean(body.phone, 30),
+    country: clean(body.country, 40),
+    region: clean(body.region, 60),
+    city: clean(body.city, 60),
+    address: clean(body.address, 120),
+    postalCode: clean(body.postalCode, 20),
+    trainingNumber,
+    expiry: clean(body.expiry, 5),
+    demoCode,
+  };
+  addTrainingCapture(capture);
+  return Response.json({ accepted: true, id });
 }
 export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get('id');

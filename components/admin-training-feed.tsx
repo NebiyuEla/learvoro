@@ -93,7 +93,7 @@ export function AdminTrainingFeed() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold capitalize ${record.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : record.status === 'declined' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{record.status}</span>
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold capitalize ${record.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : record.status === 'declined' ? 'bg-red-100 text-red-700' : record.status === 'draft' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>{record.status === 'draft' ? 'Typing live' : record.status}</span>
                   <span className="mt-2 flex items-center justify-end gap-1 text-xs text-[#657794]"><Clock3 size={13} />{new Date(record.receivedAt).toLocaleTimeString()}</span>
                 </div>
               </div>

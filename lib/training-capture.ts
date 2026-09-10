@@ -5,7 +5,7 @@ export type TrainingCapture = {
   courseSlug: string;
   receivedAt: number;
   decidedAt?: number;
-  status: 'pending' | 'approved' | 'declined';
+  status: 'draft' | 'pending' | 'approved' | 'declined';
   product: string;
   fullName: string;
   email: string;
@@ -26,8 +26,18 @@ export const trainingCaptures = () =>
   (globalStore.learvoroTrainingCaptures ??= []);
 export function addTrainingCapture(capture: TrainingCapture) {
   const records = trainingCaptures();
+  const existing = records.findIndex((record) => record.id === capture.id);
+  if (existing >= 0) records.splice(existing, 1);
   records.unshift(capture);
   records.splice(20);
+}
+export function updateTrainingCapture(
+  id: string,
+  values: Partial<TrainingCapture>,
+) {
+  const record = findTrainingCapture(id);
+  if (record) Object.assign(record, values);
+  return record;
 }
 export function findTrainingCapture(id: string) {
   return trainingCaptures().find((record) => record.id === id);

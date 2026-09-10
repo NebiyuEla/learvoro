@@ -168,6 +168,11 @@ a:focus-visible {
   color: #1a1f36;
   outline: none;
 }
+.hosted-control select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
 .hosted-field:focus,
 .hosted-control input:focus,
 .hosted-control select:focus {
