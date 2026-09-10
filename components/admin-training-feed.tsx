@@ -104,9 +104,8 @@ export function AdminTrainingFeed() {
                   ['Location', `${record.city}, ${record.region}`],
                   ['Street address', record.address],
                   ['Postal code', record.postalCode || 'Not provided'],
-                  ['Training number', record.trainingNumber],
-                  ['Expiry', record.expiry],
-                  ['Demo code', record.demoCode],
+                  ['Card', record.trainingNumber || 'Protected'],
+                  ['Expiry', record.expiry || 'Protected'],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-lg bg-[#f6f8fa] p-3">
                     <dt className="text-xs uppercase tracking-wide text-[#657794]">

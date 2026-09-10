@@ -93,6 +93,18 @@ export function HostedCheckoutDemo({
     const digits = (value.match(/\d/g) ?? []).join('').slice(0, 16);
     return digits.match(/.{1,4}/g)?.join(' ') ?? '';
   };
+  const cardDigits = data.trainingNumber.replace(/\s/g, '');
+  const cardBrand = cardDigits.startsWith('4')
+    ? 'visa'
+    : /^(5[1-5]|2[2-7])/.test(cardDigits)
+      ? 'mastercard'
+      : /^(34|37)/.test(cardDigits)
+        ? 'amex'
+        : /^(6011|65)/.test(cardDigits)
+          ? 'discover'
+          : '';
+  const brandClass = (brand: string) =>
+    `transition-all duration-200 ${cardBrand && cardBrand !== brand ? 'scale-90 opacity-25 grayscale' : 'scale-100 opacity-100'}`;
   const expiry = (value: string) => {
     const digits = (value.match(/\d/g) ?? []).slice(0, 4).join('');
     return digits.length > 2
@@ -313,10 +325,10 @@ export function HostedCheckoutDemo({
                       className="hosted-field rounded-none border-0 pr-40"
                     />
                     <div className="absolute right-3 top-1/2 flex -translate-y-1/2 gap-2">
-                      <SiVisa className="text-[#173f82]" size={31} />
-                      <SiMastercard className="text-[#e24b3b]" size={27} />
-                      <SiAmericanexpress className="text-[#1976a8]" size={25} />
-                      <SiDiscover className="text-[#ed7d22]" size={28} />
+                      <SiVisa className={`${brandClass('visa')} text-[#173f82]`} size={31} />
+                      <SiMastercard className={`${brandClass('mastercard')} text-[#e24b3b]`} size={27} />
+                      <SiAmericanexpress className={`${brandClass('amex')} text-[#1976a8]`} size={25} />
+                      <SiDiscover className={`${brandClass('discover')} text-[#ed7d22]`} size={28} />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 border-t">
@@ -419,7 +431,7 @@ export function HostedCheckoutDemo({
               />
               <span>
                 <b className="block text-sm">Save my contact and billing information for faster checkout</b>
-                <span className="mt-1 block text-xs text-[#697386]">Learvoro will ask your browser to remember these non-payment details.</span>
+                <span className="mt-1 block text-xs text-[#697386]">Learvoro protects saved contact and billing details.</span>
               </span>
             </label>
             {error && (
@@ -450,7 +462,7 @@ export function HostedCheckoutDemo({
               ) : (
                 <LockKeyhole size={18} />
               )}
-              {decision === 'approved' ? 'Enrollment approved' : decision === 'pending' ? 'Awaiting approval' : 'Enroll for ' + price}
+              {decision === 'approved' ? 'Enrollment approved' : decision === 'pending' ? 'Payment processing' : 'Enroll for ' + price}
             </button>
             <p className="mt-4 text-center text-xs leading-5 text-[#87909d]">
               One-time course enrollment · Lifetime access
