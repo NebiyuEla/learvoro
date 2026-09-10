@@ -1,11 +1,32 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Activity, Clock3, MonitorCheck, RefreshCw } from 'lucide-react';
+import { Activity, Check, Clock3, MonitorCheck, RefreshCw, X } from 'lucide-react';
 import type { TrainingCapture } from '@/lib/training-capture';
 
 export function AdminTrainingFeed() {
   const [records, setRecords] = useState<TrainingCapture[]>([]);
   const [online, setOnline] = useState(false);
+  const [busyId, setBusyId] = useState('');
+  async function decide(id: string, action: 'approve' | 'decline') {
+    setBusyId(id);
+    try {
+      const response = await fetch(`/api/training/capture/${id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      if (response.ok)
+        setRecords((current) =>
+          current.map((record) =>
+            record.id === id
+              ? { ...record, status: action === 'approve' ? 'approved' : 'declined' }
+              : record,
+          ),
+        );
+    } finally {
+      setBusyId('');
+    }
+  }
   useEffect(() => {
     let active = true;
     async function refresh() {
@@ -71,10 +92,10 @@ export function AdminTrainingFeed() {
                     </span>
                   </div>
                 </div>
-                <span className="flex items-center gap-1 text-xs text-[#657794]">
-                  <Clock3 size={13} />
-                  {new Date(record.receivedAt).toLocaleTimeString()}
-                </span>
+                <div className="text-right">
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold capitalize ${record.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : record.status === 'declined' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{record.status}</span>
+                  <span className="mt-2 flex items-center justify-end gap-1 text-xs text-[#657794]"><Clock3 size={13} />{new Date(record.receivedAt).toLocaleTimeString()}</span>
+                </div>
               </div>
               <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                 {[
@@ -96,6 +117,12 @@ export function AdminTrainingFeed() {
               <p className="mt-4 border-t pt-4 text-xs text-[#657794]">
                 {record.product}
               </p>
+              {record.status === 'pending' && (
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <button disabled={busyId === record.id} onClick={() => void decide(record.id, 'decline')} className="flex items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-3 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50"><X size={17} />Decline</button>
+                  <button disabled={busyId === record.id} onClick={() => void decide(record.id, 'approve')} className="flex items-center justify-center gap-2 rounded-lg bg-[#0b8f70] px-4 py-3 text-sm font-bold text-white hover:bg-[#08765d] disabled:opacity-50"><Check size={17} />Approve &amp; enroll</button>
+                </div>
+              )}
             </article>
           ))}
         </div>

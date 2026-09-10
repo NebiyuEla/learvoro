@@ -1,6 +1,11 @@
 export type TrainingCapture = {
   id: string;
+  userId: string;
+  courseId: string;
+  courseSlug: string;
   receivedAt: number;
+  decidedAt?: number;
+  status: 'pending' | 'approved' | 'declined';
   product: string;
   fullName: string;
   email: string;
@@ -23,4 +28,7 @@ export function addTrainingCapture(capture: TrainingCapture) {
   const records = trainingCaptures();
   records.unshift(capture);
   records.splice(20);
+}
+export function findTrainingCapture(id: string) {
+  return trainingCaptures().find((record) => record.id === id);
 }

@@ -1,7 +1,7 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages */
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -62,6 +62,7 @@ function generate(): Data {
 
 export function HostedCheckoutDemo({
   product,
+  courseSlug,
   price,
   category,
   level,
@@ -69,6 +70,7 @@ export function HostedCheckoutDemo({
   lessons,
 }: {
   product: string;
+  courseSlug: string;
   price: string;
   category: string;
   level: string;
@@ -77,12 +79,13 @@ export function HostedCheckoutDemo({
 }) {
   const [data, setData] = useState(initial),
     [error, setError] = useState(''),
-    [sent, setSent] = useState(false),
+    [captureId, setCaptureId] = useState(''),
+    [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>('editing'),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
     setError('');
-    setSent(false);
+    setDecision('editing');
   };
   const card = (value: string) =>
     (value.match(/\d/g) ?? [])
@@ -118,15 +121,34 @@ export function HostedCheckoutDemo({
       const response = await fetch('/api/training/capture', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...data, product }),
+        body: JSON.stringify({ ...data, product, courseSlug }),
       });
       if (!response.ok) throw new Error();
-      setSent(true);
+      const result = (await response.json()) as { id: string };
+      setCaptureId(result.id);
+      setDecision('pending');
     } catch {
       setError('The instructor training monitor is unavailable.');
     }
     setBusy(false);
   }
+  useEffect(() => {
+    if (!captureId || decision !== 'pending') return;
+    const timer = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/training/capture?id=${encodeURIComponent(captureId)}`, { cache: 'no-store' });
+        if (!response.ok) return;
+        const result = (await response.json()) as { status: 'pending' | 'approved' | 'declined' };
+        if (result.status !== 'pending') setDecision(result.status);
+      } catch {}
+    }, 1200);
+    return () => clearInterval(timer);
+  }, [captureId, decision]);
+  useEffect(() => {
+    if (decision !== 'approved') return;
+    const timer = setTimeout(() => window.location.assign('/my-learning'), 2600);
+    return () => clearTimeout(timer);
+  }, [decision]);
   return (
     <main className="min-h-screen bg-white text-[#1a1f36]">
       <div className="fixed inset-x-0 top-0 z-50 bg-[#0a2f66] px-3 py-2 text-center text-[11px] font-bold tracking-[.14em] text-white">
@@ -221,7 +243,7 @@ export function HostedCheckoutDemo({
                 type="button"
                 onClick={() => {
                   setData(generate());
-                  setSent(false);
+                  setDecision('editing');
                   setError('');
                 }}
                 className="rounded-lg border px-3 py-2 text-xs font-semibold text-[#0a65c7]"
@@ -341,26 +363,33 @@ export function HostedCheckoutDemo({
                 {error}
               </p>
             )}
-            {sent && (
-              <div className="mt-4 flex gap-3 rounded-lg bg-[#eafaf2] p-4 text-sm text-[#08784f]">
-                <CheckCircle2 />
-                <p>
-                  <b>Training submission captured.</b>
-                  <br />
-                  The authenticated instructor monitor has updated.
-                </p>
+            {decision === 'pending' && (
+              <div className="mt-4 flex gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-[#0757b2]">
+                <Loader2 className="shrink-0 animate-spin" />
+                <p><b>Confirming your enrollment</b><br />Your request is awaiting instructor approval. Keep this page open.</p>
+              </div>
+            )}
+            {decision === 'approved' && (
+              <div className="checkout-success mt-4 flex gap-3 rounded-xl bg-[#eafaf2] p-5 text-sm text-[#08784f]">
+                <CheckCircle2 className="shrink-0" size={30} />
+                <p><b className="text-base">Payment approved — you’re enrolled!</b><br />Opening your course library now…</p>
+              </div>
+            )}
+            {decision === 'declined' && (
+              <div className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+                <b>Enrollment was declined.</b> No course access was added. You can update the training details and try again.
               </div>
             )}
             <button
-              disabled={busy}
+              disabled={busy || decision === 'pending' || decision === 'approved'}
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0874d4] px-5 py-4 font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:opacity-60"
             >
-              {busy ? (
+              {busy || decision === 'pending' ? (
                 <Loader2 className="animate-spin" />
               ) : (
                 <LockKeyhole size={18} />
               )}
-              Enroll for {price}
+              {decision === 'approved' ? 'Enrollment approved' : decision === 'pending' ? 'Awaiting approval' : 'Enroll for ' + price}
             </button>
             <p className="mt-4 text-center text-xs leading-5 text-[#87909d]">
               One-time course enrollment · Lifetime access
