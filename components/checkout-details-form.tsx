@@ -12,7 +12,7 @@ import {
   Loader2,
   LockKeyhole,
 } from 'lucide-react';
-import { SiApplepay, SiDiscover, SiGooglepay, SiMastercard, SiVisa } from 'react-icons/si';
+import { SiAmericanexpress, SiApplepay, SiDiscover, SiGooglepay, SiMastercard, SiVisa } from 'react-icons/si';
 
 type Data = {
   fullName: string;
@@ -168,41 +168,30 @@ export function HostedCheckoutDemo({
   }, [decision]);
   return (
     <main className="min-h-screen bg-white text-[#1a1f36]">
-      <div className="grid min-h-screen lg:grid-cols-2">
-        <section className="bg-[#f7f8fa] px-6 py-8 lg:flex lg:justify-end lg:px-12 lg:py-14">
-          <div className="w-full max-w-[520px]">
-            <a
-              href="/courses"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#596780]"
-            >
-              <ArrowLeft size={16} />
-              Back to courses
-            </a>
-            <div className="mt-9 flex items-center gap-3">
-              <Image
-                src="/learvoro-logo-transparent.png"
-                alt="Learvoro"
-                width={2172}
-                height={724}
-                className="h-auto w-40"
-              />
+      <div className="grid min-h-screen bg-white lg:grid-cols-2">
+        <section className="border-r border-[#eceff3] bg-[#f7f7f8] px-6 py-10 lg:flex lg:justify-end lg:px-16 lg:py-14">
+          <div className="w-full max-w-[390px] lg:mr-8">
+            <div className="flex items-center gap-3 text-sm font-semibold text-[#3c4257]">
+              <a href="/courses" aria-label="Back to courses" className="text-[#87909d] hover:text-[#3c4257]"><ArrowLeft size={18} /></a>
+              <span className="grid size-7 place-items-center overflow-hidden rounded-full border bg-white">
+                <Image src="/icon.png" alt="" width={28} height={28} />
+              </span>
+              Learvoro
             </div>
-            <p className="mt-10 text-sm font-medium text-[#596780]">
+            <p className="mt-10 text-[15px] font-medium text-[#697386]">
               Enroll in
             </p>
-            <h1 className="mt-2 max-w-lg font-heading text-3xl font-bold leading-tight">
+            <h1 className="mt-2 max-w-lg text-lg font-semibold leading-7 text-[#30313d]">
               {product}
             </h1>
-            <div className="mt-5 flex items-end gap-3">
-              <b className="text-4xl tracking-tight">{price}</b>
-              <span className="pb-1 text-sm text-[#697386]">
-                USD · one-time payment
-              </span>
+            <div className="mt-2 flex items-end gap-2">
+              <b className="text-[34px] font-semibold tracking-tight text-[#30313d]">{price}</b>
+              <span className="pb-1.5 text-xs text-[#697386]">USD</span>
             </div>
-            <article className="mt-9 rounded-xl border bg-white p-5 shadow-sm">
+            <article className="mt-12 border-y border-[#e3e5e8] py-5">
               <div className="flex gap-4">
-                <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-[#0a3a78] text-white">
-                  <BookOpenCheck size={28} />
+                <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#0a3a78] text-white">
+                  <BookOpenCheck size={22} />
                 </span>
                 <div>
                   <h2 className="font-semibold">{product}</h2>
@@ -212,7 +201,7 @@ export function HostedCheckoutDemo({
                 </div>
                 <b className="ml-auto">{price}</b>
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-3 border-t pt-5 text-sm text-[#596780]">
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t pt-4 text-xs text-[#697386]">
                 <span className="flex items-center gap-2">
                   <GraduationCap size={17} />
                   {category} · {level}
@@ -223,30 +212,30 @@ export function HostedCheckoutDemo({
                 </span>
               </div>
             </article>
-            <div className="mt-8 flex gap-5 text-xs text-[#87909d]">
+            <div className="mt-10 flex gap-5 text-xs text-[#87909d]">
               <a href="/privacy">Privacy</a>
               <a href="/terms">Terms</a>
               <span>© Learvoro 2026</span>
             </div>
           </div>
         </section>
-        <section className="px-6 py-8 lg:px-12 lg:py-14">
+        <section className="px-6 py-10 lg:px-16 lg:py-14">
           <form
             onSubmit={submit}
             autoComplete="on"
-            className="mx-auto w-full max-w-[500px]"
+            className="mx-auto w-full max-w-[382px] lg:ml-8"
           >
             <fieldset disabled={!CHECKOUT_FORM_ENABLED} className="contents">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-heading text-2xl font-bold">
+                <h2 className="text-xl font-semibold text-[#30313d]">
                   Complete your enrollment
                 </h2>
               </div>
             </div>
-            <div className="mt-7 grid grid-cols-2 gap-3" aria-label="Unavailable express checkout methods">
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable"><SiApplepay size={48} aria-label="Apple Pay" /></button>
-              <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-[#4285f4] text-white" title="Unavailable"><SiGooglepay size={52} aria-label="Google Pay" /></button>
+            <div className="mt-7 grid grid-cols-2 gap-2" aria-label="Unavailable express checkout methods">
+              <button type="button" disabled className="flex h-[52px] cursor-not-allowed items-center justify-center rounded-md bg-black text-white" title="Unavailable"><SiApplepay size={48} aria-label="Apple Pay" /></button>
+              <button type="button" disabled className="flex h-[52px] cursor-not-allowed items-center justify-center rounded-md bg-[#4285f4] text-white" title="Unavailable"><SiGooglepay size={52} aria-label="Google Pay" /></button>
             </div>
             <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />OR<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
             <div>
@@ -280,7 +269,7 @@ export function HostedCheckoutDemo({
             </div>
             <div className="mt-7">
               <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]"></span></div>
-              <div className="mt-3 rounded-xl border p-4 shadow-sm">
+              <div className="mt-3 rounded-lg border border-[#d8dee6] p-4 shadow-[0_1px_3px_rgba(0,0,0,.06)]">
                 <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
                 <p className="mb-1 text-xs font-medium text-[#596780]">Card information</p>
                 <div className="overflow-hidden rounded-lg border">
@@ -302,6 +291,7 @@ export function HostedCheckoutDemo({
                     <div className="absolute right-3 top-1/2 flex -translate-y-1/2 gap-2">
                       <SiVisa className="text-[#173f82]" size={31} />
                       <SiMastercard className="text-[#e24b3b]" size={27} />
+                      <SiAmericanexpress className="text-[#1976a8]" size={25} />
                       <SiDiscover className="text-[#ed7d22]" size={28} />
                     </div>
                   </div>
@@ -394,7 +384,7 @@ export function HostedCheckoutDemo({
                 </div>
               </div>
             </div>
-            <label htmlFor="save-contact-details" className="mt-5 flex cursor-pointer gap-3 rounded-xl border bg-white p-4 shadow-sm">
+            <label htmlFor="save-contact-details" className="mt-5 flex cursor-pointer gap-3 rounded-lg border border-[#d8dee6] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,.05)]">
               <input
                 id="save-contact-details"
                 aria-label="Save my contact and billing information for faster checkout"
@@ -429,7 +419,7 @@ export function HostedCheckoutDemo({
             )}
             <button
               disabled={!complete || busy || decision === 'pending' || decision === 'approved'}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0874d4] px-5 py-4 font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:cursor-not-allowed disabled:bg-[#a9b6c6] disabled:opacity-55"
+              className="mt-6 flex h-[52px] w-full items-center justify-center gap-2 rounded-md bg-[#0874d4] px-5 text-[15px] font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:cursor-not-allowed disabled:bg-[#a9b6c6] disabled:opacity-55"
             >
               {busy || decision === 'pending' ? (
                 <Loader2 className="animate-spin" />
