@@ -17,18 +17,36 @@ type TrainingData = {
   demoCode: string;
 };
 const emptyData: TrainingData = {
-  fullName: '',
-  email: '',
-  phone: '',
-  country: '',
-  region: '',
-  city: '',
-  address: '',
-  postalCode: '',
-  trainingNumber: '',
-  expiry: '',
-  demoCode: '',
+  fullName: 'Student 4821',
+  email: 'student4821@example.edu',
+  phone: '+1 555 010 4821',
+  country: 'United States',
+  region: 'California',
+  city: 'San Francisco',
+  address: '482 Training Avenue',
+  postalCode: '94821',
+  trainingNumber: '0000 4821 7395 2064',
+  expiry: '12/30',
+  demoCode: '482',
 };
+function generatedData(): TrainingData {
+  const id = String(Math.floor(1000 + Math.random() * 9000));
+  const street = String(Math.floor(100 + Math.random() * 900));
+  const groups = () => String(Math.floor(1000 + Math.random() * 9000));
+  return {
+    fullName: `Student ${id}`,
+    email: `student${id}@example.edu`,
+    phone: `+1 555 010 ${id}`,
+    country: 'United States',
+    region: 'California',
+    city: 'San Francisco',
+    address: `${street} Training Avenue`,
+    postalCode: `9${id}`,
+    trainingNumber: `0000 ${groups()} ${groups()} ${groups()}`,
+    expiry: '12/30',
+    demoCode: String(Math.floor(100 + Math.random() * 900)),
+  };
+}
 
 export function CheckoutDetailsForm({
   product,
@@ -67,17 +85,17 @@ export function CheckoutDetailsForm({
   async function submit(event: { preventDefault(): void }) {
     event.preventDefault();
     if (
-      data.fullName !== 'Alex Student' ||
-      data.email !== 'alex.student@example.edu' ||
-      data.phone !== '+1 555 010 2026' ||
+      !/^Student \d{4}$/.test(data.fullName) ||
+      !/^student\d{4}@example\.edu$/.test(data.email) ||
+      !/^\+1 555 010 \d{4}$/.test(data.phone) ||
       data.country !== 'United States' ||
       data.region !== 'California' ||
       data.city !== 'San Francisco' ||
-      data.address !== '123 University Avenue' ||
-      data.postalCode !== '94107' ||
-      data.trainingNumber !== '1111 2222 3333 4444' ||
+      !/^\d{3} Training Avenue$/.test(data.address) ||
+      !/^9\d{4}$/.test(data.postalCode) ||
+      !/^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) ||
       data.expiry !== '12/30' ||
-      data.demoCode !== '123'
+      !/^\d{3}$/.test(data.demoCode)
     ) {
       setCaptured(null);
       setError(
@@ -111,7 +129,7 @@ export function CheckoutDetailsForm({
       <form
         onSubmit={submit}
         autoComplete="off"
-        className="rounded-2xl border bg-white p-5 shadow-sm sm:p-8"
+        className="rounded-2xl border bg-white p-5 shadow-sm sm:p-6"
       >
         <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -123,21 +141,37 @@ export function CheckoutDetailsForm({
           </div>
           <div className="flex gap-2">
             <Brand>
-              <SiVisa size={35} aria-label="Visa training indicator" />
+              <SiVisa
+                className="text-[#173f82]"
+                size={35}
+                aria-label="Visa training indicator"
+              />
             </Brand>
             <Brand>
               <SiMastercard
+                className="text-[#d84a3a]"
                 size={31}
                 aria-label="Mastercard training indicator"
               />
             </Brand>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            setData(generatedData());
+            setCaptured(null);
+            setError('');
+          }}
+          className="mt-4 rounded-lg border border-[#8db6df] bg-[#f4f9ff] px-4 py-2 text-sm font-semibold text-[#0757B2]"
+        >
+          Generate new synthetic data
+        </button>
         <fieldset className="mt-7">
           <legend className="font-heading text-xl font-bold">
             Customer information
           </legend>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Full name">
               <input
                 required
@@ -157,7 +191,7 @@ export function CheckoutDetailsForm({
                 className="enroll-input"
               />
             </Field>
-            <Field label="Phone number" wide>
+            <Field label="Phone number">
               <input
                 required
                 type="tel"
@@ -169,11 +203,11 @@ export function CheckoutDetailsForm({
             </Field>
           </div>
         </fieldset>
-        <fieldset className="mt-8 border-t pt-7">
+        <fieldset className="mt-6 border-t pt-5">
           <legend className="font-heading text-xl font-bold">
             Billing address
           </legend>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Country">
               <select
                 required
@@ -229,12 +263,13 @@ export function CheckoutDetailsForm({
             </Field>
           </div>
         </fieldset>
-        <fieldset className="mt-8 border-t pt-7">
+        <fieldset className="mt-6 border-t pt-5">
           <legend className="font-heading text-xl font-bold">
             Payment information
           </legend>
           <div className="mt-3 rounded-lg border border-[#b9c6d5] bg-[#f8fbff] p-4 text-sm text-[#314966]">
-            <b>Use only:</b> 1111 2222 3333 4444 · 12/30 · 123
+            <b>Synthetic-only format:</b> generated training numbers always
+            begin with 0000. Generate another safe example anytime.
           </div>
           <div className="mt-4">
             <Field label="16-digit Training Number">

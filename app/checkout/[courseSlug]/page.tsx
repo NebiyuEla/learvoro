@@ -28,7 +28,7 @@ export default async function CheckoutDemo({
         UNIVERSITY CYBERSECURITY DEMO — SYNTHETIC DATA ONLY
       </div>
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-[1380px] items-center px-5 py-5 lg:px-10">
+        <div className="mx-auto flex max-w-[1380px] items-center px-5 py-3 lg:px-10">
           <Logo />
           <div className="ml-auto flex items-center gap-3">
             <LockKeyhole className="text-[#0757B2]" size={28} />
@@ -41,7 +41,7 @@ export default async function CheckoutDemo({
           </div>
         </div>
       </header>
-      <main className="mx-auto grid max-w-[1380px] gap-7 px-4 py-8 md:px-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,.75fr)] lg:px-10">
+      <main className="mx-auto grid max-w-[1380px] gap-7 px-4 py-4 md:px-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,.75fr)] lg:px-10">
         <CheckoutDetailsForm product={course.title} price={price} />
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           <section className="rounded-2xl border bg-white p-6 shadow-sm">
