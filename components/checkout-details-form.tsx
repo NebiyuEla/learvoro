@@ -36,25 +36,6 @@ const countries = Array.from({ length: 26 * 26 }, (_, index) => {
 })
   .filter(({ code, name }) => name !== code)
   .sort((a, b) => a.name.localeCompare(b.name));
-function generate(includePayment = true): Data {
-  const id = String(Math.floor(1000 + Math.random() * 9000)),
-    street = String(Math.floor(100 + Math.random() * 900)),
-    group = () => String(Math.floor(1000 + Math.random() * 9000));
-  return {
-    fullName: `Student ${id}`,
-    email: `student${id}@example.edu`,
-    phone: `+1 555 010 ${id}`,
-    country: 'Ethiopia',
-    region: 'Addis Ababa',
-    city: 'Addis Ababa',
-    address: `${street} Training Avenue`,
-    postalCode: `9${id}`,
-    trainingNumber: includePayment ? `0000 ${group()} ${group()} ${group()}` : '',
-    expiry: includePayment ? '12/30' : '',
-    demoCode: includePayment ? String(Math.floor(100 + Math.random() * 900)) : '',
-  };
-}
-
 export function HostedCheckoutDemo({
   product,
   courseSlug,
