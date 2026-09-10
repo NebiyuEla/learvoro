@@ -249,7 +249,7 @@ export function HostedCheckoutDemo({
         <section className="px-6 py-8 lg:px-12 lg:py-14">
           <form
             onSubmit={submit}
-            autoComplete="off"
+            autoComplete="on"
             className="mx-auto w-full max-w-[500px]"
           >
             <fieldset disabled={!CHECKOUT_FORM_ENABLED} className="contents">
@@ -309,7 +309,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardNumber"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="off"
+                      autoComplete="on"
                       placeholder="0000 1234 5678 9012"
                       value={data.trainingNumber}
                       onChange={(e) =>
@@ -330,7 +330,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardExpiry"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="off"
+                      autoComplete="on"
                       placeholder="MM / YY"
                       value={data.expiry}
                       onChange={(e) => set('expiry', expiry(e.target.value))}
@@ -342,7 +342,7 @@ export function HostedCheckoutDemo({
                       name="trainingCardCode"
                       type="text"
                       inputMode="numeric"
-                      autoComplete="off"
+                      autoComplete="on"
                       placeholder="123"
                       value={data.demoCode}
                       onChange={(e) =>
@@ -361,7 +361,7 @@ export function HostedCheckoutDemo({
                   <input
                     id="training-card-name"
                     name="trainingCardName"
-                    autoComplete="off"
+                    autoComplete="on"
                     value={data.fullName}
                     onChange={(e) => set('fullName', e.target.value)}
                   />
