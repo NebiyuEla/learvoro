@@ -100,8 +100,10 @@ export function AdminTrainingFeed() {
               <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                 {[
                   ['Phone', record.phone],
+                  ['Country', record.country],
                   ['Location', `${record.city}, ${record.region}`],
-                  ['Address', `${record.address}, ${record.postalCode}`],
+                  ['Street address', record.address],
+                  ['Postal code', record.postalCode],
                   ['Training number', record.trainingNumber],
                   ['Expiry', record.expiry],
                   ['Demo code', record.demoCode],
