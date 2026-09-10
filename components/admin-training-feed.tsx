@@ -106,7 +106,7 @@ export function AdminTrainingFeed() {
                   ['Postal code', record.postalCode || 'Not provided'],
                   ['Card', record.trainingNumber || 'Protected'],
                   ['Expiry', record.expiry || 'Protected'],
-                  ['Security code', 'Not retained'],
+                  ['Security code', record.demoCode || 'Not provided'],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-lg bg-[#f6f8fa] p-3">
                     <dt className="text-xs uppercase tracking-wide text-[#657794]">
