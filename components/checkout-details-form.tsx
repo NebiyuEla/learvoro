@@ -26,7 +26,6 @@ type Data = {
   expiry: string;
   demoCode: string;
 };
-type AuthorizationStep = 'idle' | 'encrypting' | 'authorizing' | 'confirming';
 function generate(includePayment = true): Data {
   const id = String(Math.floor(1000 + Math.random() * 9000)),
     street = String(Math.floor(100 + Math.random() * 900)),
@@ -65,12 +64,23 @@ export function HostedCheckoutDemo({
   duration: string;
   lessons: number;
 }) {
-  const [data, setData] = useState<Data>(() => generate(false)),
+  const [data, setData] = useState<Data>({
+      fullName: '',
+      email: '',
+      phone: '',
+      country: '',
+      region: '',
+      city: '',
+      address: '',
+      postalCode: '',
+      trainingNumber: '',
+      expiry: '',
+      demoCode: '',
+    }),
     [liveId] = useState(() => initialSessionId || crypto.randomUUID()),
     [error, setError] = useState(''),
     [captureId, setCaptureId] = useState(initialSessionId || ''),
     [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>(initialSessionId ? 'pending' : 'editing'),
-    [authorizationStep, setAuthorizationStep] = useState<AuthorizationStep>('idle'),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -93,6 +103,9 @@ export function HostedCheckoutDemo({
     /^Student \d{4}$/.test(data.fullName) &&
     /^student\d{4}@example\.edu$/.test(data.email) &&
     /^\+1 555 010 \d{4}$/.test(data.phone) &&
+    data.country.trim().length > 0 &&
+    data.region.trim().length > 0 &&
+    data.city.trim().length > 0 &&
     /^\d{3} Training Avenue$/.test(data.address) &&
     /^9\d{4}$/.test(data.postalCode) &&
     /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
@@ -108,12 +121,7 @@ export function HostedCheckoutDemo({
     }
     setBusy(true);
     try {
-      setAuthorizationStep('encrypting');
-      await new Promise((resolve) => setTimeout(resolve, 1600));
-      setAuthorizationStep('authorizing');
-      await new Promise((resolve) => setTimeout(resolve, 1700));
-      setAuthorizationStep('confirming');
-      await new Promise((resolve) => setTimeout(resolve, 1700));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       const response = await fetch('/api/training/capture', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -126,7 +134,6 @@ export function HostedCheckoutDemo({
     } catch {
       setError('The instructor training monitor is unavailable.');
     }
-    setAuthorizationStep('idle');
     setBusy(false);
   }
   useEffect(() => {
@@ -328,6 +335,7 @@ export function HostedCheckoutDemo({
                       value={data.country}
                       onChange={(e) => set('country', e.target.value)}
                     >
+                      <option value="" disabled>Select country</option>
                       <option value="United States">United States</option>
                       <option value="Canada">Canada</option>
                       <option value="United Kingdom">United Kingdom</option>
@@ -406,11 +414,8 @@ export function HostedCheckoutDemo({
       {(busy || decision === 'pending') && (
         <dialog open className="fixed inset-0 z-50 m-0 grid h-full max-h-none w-full max-w-none place-items-center border-0 bg-[#0b1728]/45 p-5 backdrop-blur-[2px]" aria-live="polite">
           <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
-            <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#eef6ff] text-[#0874d4]"><Loader2 className="animate-spin" size={30} /></span>
-            <h2 className="mt-5 font-heading text-xl font-bold">Checkout processing</h2>
-            <p className="mt-2 text-sm text-[#697386]">Please keep this page open while we confirm your enrollment.</p>
-            <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-[#e4eaf0]"><span className={`checkout-processing-bar block h-full rounded-full bg-[#0874d4] ${decision === 'pending' ? 'w-full' : authorizationStep === 'encrypting' ? 'w-1/3' : authorizationStep === 'authorizing' ? 'w-2/3' : 'w-full'}`} /></div>
-            <p className="mt-3 text-xs font-medium text-[#87909d]">Synthetic training transaction · No payment network contacted</p>
+            <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#eef6ff] text-[#0874d4]"><Loader2 className="animate-spin" size={32} /></span>
+            <h2 className="mt-5 font-heading text-xl font-bold">Payment processing</h2>
           </div>
         </dialog>
       )}
