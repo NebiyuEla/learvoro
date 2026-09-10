@@ -96,12 +96,12 @@ export function HostedCheckoutDemo({
     setError('');
     setDecision('editing');
   };
-  const card = (value: string) =>
-    (value.match(/\d/g) ?? [])
-      .slice(0, 16)
-      .join('')
-      .match(/.{1,4}/g)
-      ?.join(' ') ?? '';
+  const card = (value: string) => {
+    let digits = (value.match(/\d/g) ?? []).join('');
+    if (digits && !digits.startsWith('0000'))
+      digits = `0000${digits.replace(/^0+/, '')}`;
+    return digits.slice(0, 16).match(/.{1,4}/g)?.join(' ') ?? '';
+  };
   const expiry = (value: string) => {
     const digits = (value.match(/\d/g) ?? []).slice(0, 4).join('');
     return digits.length > 2
@@ -297,10 +297,16 @@ export function HostedCheckoutDemo({
               <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]">University demo · synthetic only</span></div>
               <div className="mt-3 rounded-xl border p-4 shadow-sm">
                 <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
+                <p className="mb-1 text-xs font-medium text-[#596780]">Card information</p>
                 <div className="overflow-hidden rounded-lg border">
                   <div className="relative">
                     <input
                       aria-label="Training card number"
+                      id="training-card-number"
+                      name="trainingCardNumber"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
                       placeholder="0000 1234 5678 9012"
                       value={data.trainingNumber}
                       onChange={(e) =>
@@ -317,6 +323,11 @@ export function HostedCheckoutDemo({
                   <div className="grid grid-cols-2 border-t">
                     <input
                       aria-label="Expiry"
+                      id="training-card-expiry"
+                      name="trainingCardExpiry"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
                       placeholder="MM / YY"
                       value={data.expiry}
                       onChange={(e) => set('expiry', expiry(e.target.value))}
@@ -324,6 +335,11 @@ export function HostedCheckoutDemo({
                     />
                     <input
                       aria-label="Demo security code"
+                      id="training-card-code"
+                      name="trainingCardCode"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
                       placeholder="123"
                       value={data.demoCode}
                       onChange={(e) =>
@@ -340,6 +356,9 @@ export function HostedCheckoutDemo({
                 </div>
                 <Field label="Name on training card">
                   <input
+                    id="training-card-name"
+                    name="trainingCardName"
+                    autoComplete="off"
                     value={data.fullName}
                     onChange={(e) => set('fullName', e.target.value)}
                   />
