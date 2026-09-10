@@ -99,10 +99,8 @@ export function HostedCheckoutDemo({
     setDecision('editing');
   };
   const card = (value: string) => {
-    let digits = (value.match(/\d/g) ?? []).join('');
-    if (digits && !digits.startsWith('0000'))
-      digits = `0000${digits.replace(/^0+/, '')}`;
-    return digits.slice(0, 16).match(/.{1,4}/g)?.join(' ') ?? '';
+    const digits = (value.match(/\d/g) ?? []).join('').slice(0, 19);
+    return digits.match(/.{1,4}/g)?.join(' ') ?? '';
   };
   const expiry = (value: string) => {
     const digits = (value.match(/\d/g) ?? []).slice(0, 4).join('');
@@ -111,22 +109,22 @@ export function HostedCheckoutDemo({
       : digits;
   };
   const complete =
-    /^Student \d{4}$/.test(data.fullName) &&
-    /^student\d{4}@example\.edu$/.test(data.email) &&
-    /^\+1 555 010 \d{4}$/.test(data.phone) &&
+    data.fullName.trim().length >= 2 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) &&
+    data.phone.trim().length >= 7 &&
     data.country.trim().length > 0 &&
     data.region.trim().length > 0 &&
     data.city.trim().length > 0 &&
-    /^\d{3} Training Avenue$/.test(data.address) &&
-    /^9\d{4}$/.test(data.postalCode) &&
-    /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
+    data.address.trim().length >= 3 &&
+    data.postalCode.trim().length >= 3 &&
+    /^\d{13,19}$/.test(data.trainingNumber.replace(/\s/g, '')) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(data.expiry) &&
-    /^\d{3}$/.test(data.demoCode);
+    /^\d{3,4}$/.test(data.demoCode);
   async function submit(e: { preventDefault(): void }) {
     e.preventDefault();
     if (!complete) {
       setError(
-        'Training mode: generate a synthetic classroom profile before continuing.',
+        'Please complete all required fields correctly.',
       );
       return;
     }
@@ -310,7 +308,7 @@ export function HostedCheckoutDemo({
                       type="text"
                       inputMode="numeric"
                       autoComplete="on"
-                      placeholder="0000 1234 5678 9012"
+                      placeholder="1234 5678 9012 3456"
                       value={data.trainingNumber}
                       onChange={(e) =>
                         set('trainingNumber', card(e.target.value))
@@ -348,9 +346,7 @@ export function HostedCheckoutDemo({
                       onChange={(e) =>
                         set(
                           'demoCode',
-                          (e.target.value.match(/\d/g) ?? [])
-                            .slice(0, 3)
-                            .join(''),
+                          (e.target.value.match(/\d/g) ?? []).join(''),
                         )
                       }
                       className="hosted-field rounded-none border-0"

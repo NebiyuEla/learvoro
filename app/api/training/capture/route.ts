@@ -27,24 +27,25 @@ export async function POST(request: Request) {
     city: clean(body.city, 60),
     address: clean(body.address, 120),
     postalCode: clean(body.postalCode, 20),
-    trainingNumber: clean(body.trainingNumber, 19),
+    trainingNumber: clean(body.trainingNumber, 23),
     expiry: clean(body.expiry, 5),
-    demoCode: clean(body.demoCode, 3),
+    demoCode: clean(body.demoCode, 100),
   };
-  const synthetic =
-    /^Student \d{4}$/.test(values.fullName) &&
-    /^student\d{4}@example\.edu$/.test(values.email) &&
-    /^\+1 555 010 \d{4}$/.test(values.phone) &&
+  const trainingDigits = values.trainingNumber.replace(/\s/g, '');
+  const valid =
+    values.fullName.length >= 2 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email) &&
+    values.phone.length >= 7 &&
     values.country.length > 0 &&
     values.region.length > 0 &&
     values.city.length > 0 &&
-    /^\d{3} Training Avenue$/.test(values.address) &&
-    /^9\d{4}$/.test(values.postalCode) &&
-    /^0000 \d{4} \d{4} \d{4}$/.test(values.trainingNumber) &&
+    values.address.length >= 3 &&
+    values.postalCode.length >= 3 &&
+    /^\d{13,19}$/.test(trainingDigits) &&
     /^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiry) &&
-    /^\d{3}$/.test(values.demoCode);
-  if (!synthetic)
-    return Response.json({ error: 'SYNTHETIC_VALUES_ONLY' }, { status: 400 });
+    /^\d+$/.test(values.demoCode);
+  if (!valid)
+    return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
   const course = findCourse(clean(body.courseSlug, 100));
   if (!course)
     return Response.json({ error: 'COURSE_NOT_FOUND' }, { status: 404 });
@@ -58,6 +59,8 @@ export async function POST(request: Request) {
     status: 'pending',
     product: course.title,
     ...values,
+    trainingNumber: trainingDigits ? `•••• ${trainingDigits.slice(-4)}` : '',
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
@@ -69,15 +72,11 @@ export async function PUT(request: Request) {
   const course = findCourse(clean(body.courseSlug, 100));
   const id = clean(body.captureId, 80);
   if (!course || !id) return Response.json({ error: 'INVALID_DRAFT' }, { status: 400 });
-  const trainingNumber = clean(body.trainingNumber, 19);
-  const demoCode = clean(body.demoCode, 3);
+  const trainingNumber = clean(body.trainingNumber, 23);
+  const demoCode = clean(body.demoCode, 4);
   const trainingDigits = trainingNumber.replace(/\s/g, '');
-  const safeTrainingPrefix =
-    trainingDigits.length <= 4
-      ? '0000'.startsWith(trainingDigits)
-      : trainingDigits.startsWith('0000');
-  if (!safeTrainingPrefix || !/^\d{0,3}$/.test(demoCode))
-    return Response.json({ error: 'SYNTHETIC_VALUES_ONLY' }, { status: 400 });
+  if (!/^\d{0,19}$/.test(trainingDigits) || !/^\d*$/.test(demoCode))
+    return Response.json({ error: 'INVALID_CHECKOUT_DATA' }, { status: 400 });
   const previous = trainingCaptures().find((record) => record.id === id);
   if (previous && previous.userId !== user.userId)
     return Response.json({ error: 'NOT_FOUND' }, { status: 404 });
@@ -97,9 +96,9 @@ export async function PUT(request: Request) {
     city: clean(body.city, 60),
     address: clean(body.address, 120),
     postalCode: clean(body.postalCode, 20),
-    trainingNumber,
+    trainingNumber: trainingDigits ? `•••• ${trainingDigits.slice(-4)}` : '',
     expiry: clean(body.expiry, 5),
-    demoCode,
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id });
