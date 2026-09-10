@@ -109,6 +109,10 @@ export function HostedCheckoutDemo({
       ? `${digits.slice(0, 2)}/${digits.slice(2)}`
       : digits;
   };
+  const phone = (value: string) => {
+    const digits = (value.match(/\d/g) ?? []).join('').slice(0, 15);
+    return digits ? `+${digits.match(/.{1,3}/g)?.join(' ') ?? digits}` : '';
+  };
   const complete =
     data.fullName.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) &&
@@ -263,7 +267,7 @@ export function HostedCheckoutDemo({
               <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-black text-white" title="Unavailable in training mode"><SiApplepay size={48} aria-label="Apple Pay" /></button>
               <button type="button" disabled className="flex h-12 cursor-not-allowed items-center justify-center rounded-lg bg-[#4285f4] text-white" title="Unavailable in training mode"><SiGooglepay size={52} aria-label="Google Pay" /></button>
             </div>
-            <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />Or pay with synthetic card<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
+            <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />OR<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
             <div>
               <h3 className="text-sm font-semibold">Contact information</h3>
               <Field label="Email">
@@ -277,14 +281,20 @@ export function HostedCheckoutDemo({
                 />
               </Field>
               <Field label="Phone">
-                <input
-                  required
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={data.phone}
-                  onChange={(e) => set('phone', e.target.value)}
-                />
+                <span className="relative block">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-[#1a1f36]">+</span>
+                  <input
+                    required
+                    name="phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="251 91 234 5678"
+                    value={data.phone.replace(/^\+/, '')}
+                    onChange={(e) => set('phone', phone(e.target.value))}
+                    className="pl-7"
+                  />
+                </span>
               </Field>
             </div>
             <div className="mt-7">
@@ -346,7 +356,7 @@ export function HostedCheckoutDemo({
                     />
                   </div>
                 </div>
-                <Field label="Name on training card">
+                <Field label="Cardholder name">
                   <input
                     id="training-card-name"
                     name="trainingCardName"

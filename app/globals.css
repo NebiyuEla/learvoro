@@ -188,3 +188,9 @@ a:focus-visible {
 }
 .checkout-success{animation:checkout-pop .45s cubic-bezier(.2,.9,.25,1)}
 @keyframes checkout-pop{0%{opacity:0;transform:scale(.94)}70%{transform:scale(1.02)}100%{opacity:1;transform:scale(1)}}
+.page-transition-content{opacity:0}.page-transition-content.is-ready{animation:page-in .28s ease-out forwards}
+.page-transition-loader{position:fixed;inset:0;z-index:9999;display:grid;place-content:center;justify-items:center;gap:1.25rem;background:#fff}
+.page-transition-line{display:block;width:10rem;height:3px;overflow:hidden;border-radius:999px;background:#e5eaf0}
+.page-transition-line i{display:block;width:45%;height:100%;border-radius:inherit;background:#0874d4;animation:page-load .8s ease-in-out infinite}
+@keyframes page-load{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
+@keyframes page-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
