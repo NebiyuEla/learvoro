@@ -1,298 +1,355 @@
 'use client';
-/* oxlint-disable next/no-html-link-for-pages */
 import { useState } from 'react';
-import {
-  CheckCircle2,
-  CreditCard,
-  HelpCircle,
-  Loader2,
-  LockKeyhole,
-  ShieldCheck,
-  Users,
-} from 'lucide-react';
-type Props = {
-  courseSlug: string;
-  email: string;
+import { CheckCircle2, CreditCard, LockKeyhole } from 'lucide-react';
+
+type TrainingData = {
   fullName: string;
-  category: string;
-  price: string;
+  email: string;
+  phone: string;
+  country: string;
+  region: string;
+  city: string;
+  address: string;
+  postalCode: string;
+  trainingNumber: string;
+  expiry: string;
+  demoCode: string;
 };
+const emptyData: TrainingData = {
+  fullName: '',
+  email: '',
+  phone: '',
+  country: '',
+  region: '',
+  city: '',
+  address: '',
+  postalCode: '',
+  trainingNumber: '',
+  expiry: '',
+  demoCode: '',
+};
+
 export function CheckoutDetailsForm({
-  courseSlug,
-  email,
-  fullName,
-  category,
+  product,
   price,
-}: Props) {
-  const [showPayment, setShowPayment] = useState(false);
-  const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>(
-    'idle',
-  );
+}: {
+  product: string;
+  price: string;
+}) {
+  const [data, setData] = useState<TrainingData>(emptyData);
+  const [captured, setCaptured] = useState<TrainingData | null>(null);
   const [error, setError] = useState('');
-  async function submit(e: {
-    preventDefault(): void;
-    currentTarget: HTMLFormElement;
-  }) {
-    e.preventDefault();
-    setState('saving');
+  function update<K extends keyof TrainingData>(
+    key: K,
+    value: TrainingData[K],
+  ) {
+    setData((current) => ({ ...current, [key]: value }));
+    setCaptured(null);
     setError('');
-    const f = new FormData(e.currentTarget);
-    try {
-      const response = await fetch('/api/checkout/details', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          courseSlug,
-          fullName: f.get('fullName'),
-          studentReference: f.get('studentReference'),
-          learningMode: f.get('learningMode'),
-          countryCode: f.get('countryCode'),
-          addressLine1: f.get('addressLine1'),
-          city: f.get('city'),
-          postalCode: f.get('postalCode'),
-          saveDetails: f.get('saveDetails') === 'on',
-        }),
-      });
-      const body = (await response.json().catch(() => ({}))) as {
-        error?: string;
-      };
-      if (response.ok) {
-        setState('saved');
-        setShowPayment(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-      setError(
-        body.error === 'AUTHENTICATION_REQUIRED'
-          ? 'Your session expired. Please log in again.'
-          : body.error === 'MISSING_REQUIRED_DETAILS'
-            ? 'Please complete every required field.'
-            : 'We could not save your enrollment. Please try again.',
-      );
-    } catch {
-      setError(
-        'Unable to reach the server. Please check your connection and try again.',
-      );
-    }
-    setState('error');
   }
-  if (showPayment) return <PaymentShell price={price} />;
+  function formatNumber(value: string) {
+    return (
+      (value.match(/\d/g) ?? [])
+        .slice(0, 16)
+        .join('')
+        .match(/.{1,4}/g)
+        ?.join(' ') ?? ''
+    );
+  }
+  function formatExpiry(value: string) {
+    const digits = (value.match(/\d/g) ?? []).slice(0, 4).join('');
+    return digits.length > 2
+      ? `${digits.slice(0, 2)}/${digits.slice(2)}`
+      : digits;
+  }
+  function submit(event: { preventDefault(): void }) {
+    event.preventDefault();
+    if (
+      data.trainingNumber !== '1111 2222 3333 4444' ||
+      data.expiry !== '12/30' ||
+      data.demoCode !== '123'
+    ) {
+      setCaptured(null);
+      setError(
+        'Training mode: only the provided synthetic payment credentials can be used.',
+      );
+      return;
+    }
+    setError('');
+    setCaptured({ ...data });
+  }
   return (
-    <form
-      method="post"
-      onSubmit={submit}
-      className="rounded-xl border bg-white p-7 shadow-sm"
-    >
-      <h1 className="font-heading text-3xl font-bold">Enrollment Details</h1>
-      <p className="mt-4 flex items-center gap-3 text-[#536b8b]">
-        <LockKeyhole size={18} />
-        Your information is secure and private
-      </p>
-      <div className="mt-6 space-y-5">
-        <Field label="Full name">
-          <input
-            name="fullName"
-            defaultValue={fullName}
-            required
-            autoComplete="name"
-            placeholder="John Doe"
-            className="enroll-input"
-          />
-        </Field>
-        <Field label="Email address">
-          <input value={email} readOnly className="enroll-input bg-[#f8fafc]" />
-        </Field>
-        <Field label="Student ID">
-          <div className="relative">
-            <input
-              name="studentReference"
-              required
-              inputMode="numeric"
-              pattern="[0-9 ]{6,24}"
-              placeholder="9876 5432 1098 7654"
-              className="enroll-input pr-12"
-            />
-            <HelpCircle
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#314966]"
-              size={20}
-            />
-          </div>
-          <span className="mt-1 block text-sm font-normal text-[#667b98]">
-            Your student ID or reference number
-          </span>
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Course category">
-            <select
-              value={category}
-              disabled
-              aria-readonly="true"
-              className="enroll-input bg-white disabled:opacity-100"
-            >
-              <option>{category}</option>
-            </select>
-          </Field>
-          <Field label="Learning mode">
-            <select
-              name="learningMode"
-              defaultValue="self-paced"
-              className="enroll-input bg-white"
-            >
-              <option value="self-paced">Self-paced</option>
-              <option value="instructor-led">Instructor-led</option>
-            </select>
-          </Field>
-        </div>
-        <Field label="Country">
-          <select
-            name="countryCode"
-            defaultValue="US"
-            className="enroll-input bg-white"
-          >
-            <option value="US">United States</option>
-            <option value="ET">Ethiopia</option>
-            <option value="KE">Kenya</option>
-            <option value="GB">United Kingdom</option>
-            <option value="CA">Canada</option>
-            <option value="NG">Nigeria</option>
-            <option value="ZA">South Africa</option>
-          </select>
-        </Field>
-        <Field label="Address line 1">
-          <input
-            name="addressLine1"
-            required
-            autoComplete="address-line1"
-            placeholder="123 Learning Lane"
-            className="enroll-input"
-          />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="City">
-            <input
-              name="city"
-              required
-              autoComplete="address-level2"
-              placeholder="San Francisco"
-              className="enroll-input"
-            />
-          </Field>
-          <Field label="Postal code (optional)">
-            <input
-              name="postalCode"
-              autoComplete="postal-code"
-              placeholder="94107"
-              className="enroll-input"
-            />
-          </Field>
-        </div>
-        <label className="flex items-center gap-3 text-base">
-          <input
-            name="saveDetails"
-            type="checkbox"
-            defaultChecked
-            className="size-5 accent-[#087af0]"
-          />
-          Save these details for faster enrollment next time
-        </label>
-      </div>
-      <button
-        disabled={state === 'saving'}
-        className="mt-5 flex w-full items-center justify-center gap-3 rounded-md bg-[#087af0] px-5 py-4 text-lg font-semibold text-white hover:bg-[#066bd1] disabled:opacity-60"
+    <div className="space-y-6">
+      <form
+        onSubmit={submit}
+        autoComplete="off"
+        className="rounded-2xl border bg-white p-5 shadow-sm sm:p-8"
       >
-        {state === 'saving' ? <Loader2 className="animate-spin" /> : <Users />}
-        Continue Enrollment
-      </button>
-      {state === 'saved' && (
-        <output className="mt-4 flex items-center gap-2 rounded-lg bg-[#e9f8f2] p-3 text-sm font-semibold text-[#087861]">
-          <CheckCircle2 size={18} />
-          Enrollment details saved successfully.
-        </output>
-      )}
-      {state === 'error' && (
-        <p
-          role="alert"
-          className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+        <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="font-heading text-3xl font-bold">Secure checkout</h1>
+            <p className="mt-2 flex items-center gap-2 text-sm text-[#657794]">
+              <LockKeyhole size={17} />
+              Local classroom simulation
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Brand>VISA</Brand>
+            <Brand>Mastercard</Brand>
+          </div>
+        </div>
+        <fieldset className="mt-7">
+          <legend className="font-heading text-xl font-bold">
+            Customer information
+          </legend>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Field label="Full name">
+              <input
+                required
+                value={data.fullName}
+                onChange={(e) => update('fullName', e.target.value)}
+                placeholder="Alex Student"
+                className="enroll-input"
+              />
+            </Field>
+            <Field label="Email">
+              <input
+                required
+                type="email"
+                value={data.email}
+                onChange={(e) => update('email', e.target.value)}
+                placeholder="alex.student@example.edu"
+                className="enroll-input"
+              />
+            </Field>
+            <Field label="Phone number" wide>
+              <input
+                required
+                type="tel"
+                value={data.phone}
+                onChange={(e) => update('phone', e.target.value)}
+                placeholder="+1 555 010 2026"
+                className="enroll-input"
+              />
+            </Field>
+          </div>
+        </fieldset>
+        <fieldset className="mt-8 border-t pt-7">
+          <legend className="font-heading text-xl font-bold">
+            Billing address
+          </legend>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Field label="Country">
+              <select
+                required
+                value={data.country}
+                onChange={(e) => update('country', e.target.value)}
+                className="enroll-input bg-white"
+              >
+                <option value="">Select country</option>
+                <option>United States</option>
+                <option>Ethiopia</option>
+                <option>Kenya</option>
+                <option>United Kingdom</option>
+                <option>Canada</option>
+                <option>Nigeria</option>
+                <option>South Africa</option>
+              </select>
+            </Field>
+            <Field label="State / Region">
+              <input
+                required
+                value={data.region}
+                onChange={(e) => update('region', e.target.value)}
+                placeholder="State or region"
+                className="enroll-input"
+              />
+            </Field>
+            <Field label="City">
+              <input
+                required
+                value={data.city}
+                onChange={(e) => update('city', e.target.value)}
+                placeholder="City"
+                className="enroll-input"
+              />
+            </Field>
+            <Field label="Postal code">
+              <input
+                required
+                value={data.postalCode}
+                onChange={(e) => update('postalCode', e.target.value)}
+                placeholder="Postal code"
+                className="enroll-input"
+              />
+            </Field>
+            <Field label="Street address" wide>
+              <input
+                required
+                value={data.address}
+                onChange={(e) => update('address', e.target.value)}
+                placeholder="123 University Avenue"
+                className="enroll-input"
+              />
+            </Field>
+          </div>
+        </fieldset>
+        <fieldset className="mt-8 border-t pt-7">
+          <legend className="font-heading text-xl font-bold">
+            Payment information
+          </legend>
+          <div className="mt-3 rounded-lg border border-[#b9c6d5] bg-[#f8fbff] p-4 text-sm text-[#314966]">
+            <b>Use only:</b> 1111 2222 3333 4444 · 12/30 · 123
+          </div>
+          <div className="mt-4">
+            <Field label="16-digit Training Number">
+              <div className="relative">
+                <input
+                  required
+                  inputMode="numeric"
+                  value={data.trainingNumber}
+                  onChange={(e) =>
+                    update('trainingNumber', formatNumber(e.target.value))
+                  }
+                  placeholder="1111 2222 3333 4444"
+                  className="enroll-input pr-12"
+                />
+                <CreditCard
+                  className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-[#49617d]"
+                  size={22}
+                />
+              </div>
+            </Field>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <Field label="Expiry date">
+                <input
+                  required
+                  inputMode="numeric"
+                  value={data.expiry}
+                  onChange={(e) =>
+                    update('expiry', formatExpiry(e.target.value))
+                  }
+                  placeholder="MM/YY"
+                  className="enroll-input"
+                />
+              </Field>
+              <Field label="Demo Security Code">
+                <input
+                  required
+                  inputMode="numeric"
+                  value={data.demoCode}
+                  onChange={(e) =>
+                    update(
+                      'demoCode',
+                      (e.target.value.match(/\d/g) ?? []).slice(0, 3).join(''),
+                    )
+                  }
+                  placeholder="123"
+                  className="enroll-input"
+                />
+              </Field>
+            </div>
+          </div>
+        </fieldset>
+        {error && (
+          <p
+            role="alert"
+            className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700"
+          >
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#066bd1]"
         >
-          {error}
+          <LockKeyhole />
+          Pay securely · {price}
+        </button>
+        <p className="mt-4 text-center text-xs leading-5 text-[#657794]">
+          Training simulation only. No information leaves this browser tab, and
+          everything disappears when the page refreshes.
         </p>
-      )}
-      <p className="mt-6 text-sm text-[#516985]">
-        By continuing, you agree to our{' '}
-        <a className="text-[#087af0] underline" href="/terms">
-          Terms of Service
-        </a>{' '}
-        and{' '}
-        <a className="text-[#087af0] underline" href="/privacy">
-          Privacy Policy
-        </a>
-        .
-      </p>
-    </form>
+      </form>
+      {captured && <CapturedPanel data={captured} product={product} />}
+    </div>
   );
 }
 
-function PaymentShell({ price }: { price: string }) {
+function CapturedPanel({
+  data,
+  product,
+}: {
+  data: TrainingData;
+  product: string;
+}) {
+  const rows: [string, string][] = [
+    ['Full Name', data.fullName],
+    ['Email', data.email],
+    ['Phone', data.phone],
+    ['Country', data.country],
+    ['State', data.region],
+    ['City', data.city],
+    ['Address', data.address],
+    ['Postal Code', data.postalCode],
+    ['Training Number', data.trainingNumber],
+    ['Expiry', data.expiry],
+    ['Demo Security Code', data.demoCode],
+  ];
   return (
-    <section className="rounded-xl border bg-white p-7 shadow-sm md:p-8">
-      <div className="flex items-start justify-between gap-4">
+    <section
+      aria-live="polite"
+      className="rounded-2xl border-2 border-[#0b9b78] bg-white p-5 shadow-sm sm:p-8"
+    >
+      <div className="flex gap-3">
+        <CheckCircle2 className="shrink-0 text-[#0b9b78]" />
         <div>
-          <h1 className="font-heading text-3xl font-bold">Payment Details</h1>
-          <p className="mt-3 flex items-center gap-2 text-[#657794]">
-            <LockKeyhole size={18} /> Secure card entry
+          <h2 className="font-heading text-2xl font-bold">
+            Captured Form Data — Training Simulation
+          </h2>
+          <p className="mt-1 text-sm text-[#657794]">
+            Submitted locally for: {product}
           </p>
         </div>
-        <div className="hidden rounded-md border px-3 py-2 text-sm text-[#657794] sm:block">
-          Powered by <b className="text-[#635bff]">stripe</b>
-        </div>
       </div>
-      <div className="mt-8" aria-label="Card entry preview">
-        <p className="font-semibold">Card information</p>
-        <div className="mt-3 overflow-hidden rounded-lg border border-[#ccd6e2] text-[#8a97a8]">
-          <div className="flex items-center px-5 py-4">
-            <span>1234 5678 9012 3456</span>
-            <CreditCard className="ml-auto text-[#49617d]" size={22} />
+      <dl className="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="border-b pb-3">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-[#657794]">
+              {label}
+            </dt>
+            <dd className="mt-1 break-words font-medium">{value}</dd>
           </div>
-          <div className="grid grid-cols-2 border-t">
-            <span className="border-r px-5 py-4">MM / YY</span>
-            <span className="px-5 py-4">CVC</span>
-          </div>
-        </div>
-        <p className="mt-2 text-xs text-[#657794]">
-          Preview only. Connect Stripe Elements here before accepting payments.
-        </p>
+        ))}
+      </dl>
+      <div className="mt-6 rounded-xl bg-[#fff7df] p-4 text-sm leading-6 text-[#614b10]">
+        <b>Why this matters:</b> In a real phishing attack, a malicious website
+        could transmit captured information elsewhere. This training application
+        intentionally does NOT implement that capability.
       </div>
-      <div className="mt-7 rounded-lg bg-[#eafaf2] p-4 text-[#08784f]">
-        <div className="flex gap-3">
-          <ShieldCheck />
-          <div>
-            <b>Built for secure payment</b>
-            <p className="mt-1 text-sm">
-              Connect Stripe Elements so sensitive card data goes directly to
-              Stripe.
-            </p>
-          </div>
-        </div>
-      </div>
-      <button
-        type="button"
-        disabled
-        className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white opacity-60"
-      >
-        <LockKeyhole /> Pay {price}
-      </button>
     </section>
+  );
+}
+function Brand({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-md border bg-white px-3 py-2 text-xs font-extrabold tracking-tight text-[#173f82]">
+      {children}
+    </span>
   );
 }
 function Field({
   label,
   children,
+  wide = false,
 }: {
   label: string;
   children: React.ReactNode;
+  wide?: boolean;
 }) {
   return (
-    <label className="block text-base font-semibold text-[#12213d]">
+    <label
+      className={`block text-sm font-semibold text-[#12213d] ${wide ? 'sm:col-span-2' : ''}`}
+    >
       {label}
       {children}
     </label>
