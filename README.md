@@ -16,6 +16,8 @@ Set Stripe test-mode keys and forward Stripe CLI events to `/api/webhooks/stripe
 
 ## Production setup
 
+- Render does not require a Blueprint. Create a PostgreSQL database manually in the Render dashboard, copy its **Internal Database URL** into the web service's `DATABASE_URL`, and use `npm start` as the start command. The start command applies the database schema before launching the site.
+- For the existing Render web service, use `npm ci && npm run build` as the build command and `npm start` as the start command.
 - Configure Stripe, email and video provider secrets through the hosting control plane, never in source.
 - Configure the Stripe webhook signing secret and subscribe to PaymentIntent success/failure, refund and dispute events.
 - Store paid resources in private object storage and issue them only through entitlement-checked server routes.
