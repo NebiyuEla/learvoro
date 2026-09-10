@@ -16,7 +16,7 @@ export function AdminLogin(){
     }catch{setError('Unable to reach the server. Please try again.')}
     setBusy(false);
   }
-  return <form onSubmit={submit} className="mt-8 space-y-5">
+  return <form method="post" onSubmit={submit} className="mt-8 space-y-5">
     <label className="block text-sm font-semibold">Admin email<input name="email" type="email" required autoComplete="username" className="field"/></label>
     <label className="block text-sm font-semibold">Password<input name="password" type="password" required autoComplete="current-password" className="field"/></label>
     <button type="submit" disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0757B2] p-3.5 font-semibold text-white disabled:opacity-60">{busy?<Loader2 className="animate-spin" size={18}/>:<LockKeyhole size={18}/>} {busy?'Signing in…':'Sign in to admin'}</button>

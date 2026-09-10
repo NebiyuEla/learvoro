@@ -1,6 +1,239 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages */
-import{useState}from'react';import{CheckCircle2,HelpCircle,Loader2,LockKeyhole,Users}from'lucide-react';
-type Props={courseSlug:string;email:string;fullName:string;category:string};
-export function CheckoutDetailsForm({courseSlug,email,fullName,category}:Props){const[state,setState]=useState<'idle'|'saving'|'saved'|'error'>('idle');async function submit(e:{preventDefault():void;currentTarget:HTMLFormElement}){e.preventDefault();setState('saving');const f=new FormData(e.currentTarget);const response=await fetch('/api/checkout/details',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({courseSlug,fullName:f.get('fullName'),studentReference:f.get('studentReference'),learningMode:f.get('learningMode'),countryCode:f.get('countryCode'),addressLine1:f.get('addressLine1'),city:f.get('city'),postalCode:f.get('postalCode'),saveDetails:f.get('saveDetails')==='on'})});setState(response.ok?'saved':'error')}return <form onSubmit={submit} className="rounded-xl border bg-white p-7 shadow-sm"><h1 className="font-heading text-3xl font-bold">Enrollment Details</h1><p className="mt-4 flex items-center gap-3 text-[#536b8b]"><LockKeyhole size={18}/>Your information is secure and private</p><div className="mt-6 space-y-5"><Field label="Full name"><input name="fullName" defaultValue={fullName} required autoComplete="name" placeholder="John Doe" className="enroll-input"/></Field><Field label="Email address"><input value={email} readOnly className="enroll-input bg-[#f8fafc]"/></Field><Field label="Student ID"><div className="relative"><input name="studentReference" required inputMode="numeric" pattern="[0-9 ]{6,24}" placeholder="9876 5432 1098 7654" className="enroll-input pr-12"/><HelpCircle className="absolute right-4 top-1/2 -translate-y-1/2 text-[#314966]" size={20}/></div><span className="mt-1 block text-sm font-normal text-[#667b98]">Your student ID or reference number</span></Field><div className="grid gap-4 sm:grid-cols-2"><Field label="Course category"><select value={category} disabled aria-readonly="true" className="enroll-input bg-white disabled:opacity-100"><option>{category}</option></select></Field><Field label="Learning mode"><select name="learningMode" defaultValue="self-paced" className="enroll-input bg-white"><option value="self-paced">Self-paced</option><option value="instructor-led">Instructor-led</option></select></Field></div><Field label="Country"><select name="countryCode" defaultValue="US" className="enroll-input bg-white"><option value="US">United States</option><option value="ET">Ethiopia</option><option value="KE">Kenya</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="NG">Nigeria</option><option value="ZA">South Africa</option></select></Field><Field label="Address line 1"><input name="addressLine1" required autoComplete="address-line1" placeholder="123 Learning Lane" className="enroll-input"/></Field><div className="grid gap-4 sm:grid-cols-2"><Field label="City"><input name="city" required autoComplete="address-level2" placeholder="San Francisco" className="enroll-input"/></Field><Field label="Postal code (optional)"><input name="postalCode" autoComplete="postal-code" placeholder="94107" className="enroll-input"/></Field></div><label className="flex items-center gap-3 text-base"><input name="saveDetails" type="checkbox" defaultChecked className="size-5 accent-[#087af0]"/>Save these details for faster enrollment next time</label></div><button disabled={state==='saving'} className="mt-5 flex w-full items-center justify-center gap-3 rounded-md bg-[#087af0] px-5 py-4 text-lg font-semibold text-white hover:bg-[#066bd1] disabled:opacity-60">{state==='saving'?<Loader2 className="animate-spin"/>:<Users/>}Continue Enrollment</button>{state==='saved'&&<output className="mt-4 flex items-center gap-2 rounded-lg bg-[#e9f8f2] p-3 text-sm font-semibold text-[#087861]"><CheckCircle2 size={18}/>Enrollment details saved successfully.</output>}{state==='error'&&<p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">Please check the information and try again.</p>}<p className="mt-6 text-sm text-[#516985]">By continuing, you agree to our <a className="text-[#087af0] underline" href="/terms">Terms of Service</a> and <a className="text-[#087af0] underline" href="/privacy">Privacy Policy</a>.</p></form>}
-function Field({label,children}:{label:string;children:React.ReactNode}){return <label className="block text-base font-semibold text-[#12213d]">{label}{children}</label>}
+import { useState } from 'react';
+import {
+  CheckCircle2,
+  HelpCircle,
+  Loader2,
+  LockKeyhole,
+  Users,
+} from 'lucide-react';
+type Props = {
+  courseSlug: string;
+  email: string;
+  fullName: string;
+  category: string;
+};
+export function CheckoutDetailsForm({
+  courseSlug,
+  email,
+  fullName,
+  category,
+}: Props) {
+  const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>(
+    'idle',
+  );
+  const [error, setError] = useState('');
+  async function submit(e: {
+    preventDefault(): void;
+    currentTarget: HTMLFormElement;
+  }) {
+    e.preventDefault();
+    setState('saving');
+    setError('');
+    const f = new FormData(e.currentTarget);
+    try {
+      const response = await fetch('/api/checkout/details', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          courseSlug,
+          fullName: f.get('fullName'),
+          studentReference: f.get('studentReference'),
+          learningMode: f.get('learningMode'),
+          countryCode: f.get('countryCode'),
+          addressLine1: f.get('addressLine1'),
+          city: f.get('city'),
+          postalCode: f.get('postalCode'),
+          saveDetails: f.get('saveDetails') === 'on',
+        }),
+      });
+      const body = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (response.ok) {
+        setState('saved');
+        return;
+      }
+      setError(
+        body.error === 'AUTHENTICATION_REQUIRED'
+          ? 'Your session expired. Please log in again.'
+          : body.error === 'MISSING_REQUIRED_DETAILS'
+            ? 'Please complete every required field.'
+            : 'We could not save your enrollment. Please try again.',
+      );
+    } catch {
+      setError(
+        'Unable to reach the server. Please check your connection and try again.',
+      );
+    }
+    setState('error');
+  }
+  return (
+    <form
+      method="post"
+      onSubmit={submit}
+      className="rounded-xl border bg-white p-7 shadow-sm"
+    >
+      <h1 className="font-heading text-3xl font-bold">Enrollment Details</h1>
+      <p className="mt-4 flex items-center gap-3 text-[#536b8b]">
+        <LockKeyhole size={18} />
+        Your information is secure and private
+      </p>
+      <div className="mt-6 space-y-5">
+        <Field label="Full name">
+          <input
+            name="fullName"
+            defaultValue={fullName}
+            required
+            autoComplete="name"
+            placeholder="John Doe"
+            className="enroll-input"
+          />
+        </Field>
+        <Field label="Email address">
+          <input value={email} readOnly className="enroll-input bg-[#f8fafc]" />
+        </Field>
+        <Field label="Student ID">
+          <div className="relative">
+            <input
+              name="studentReference"
+              required
+              inputMode="numeric"
+              pattern="[0-9 ]{6,24}"
+              placeholder="9876 5432 1098 7654"
+              className="enroll-input pr-12"
+            />
+            <HelpCircle
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#314966]"
+              size={20}
+            />
+          </div>
+          <span className="mt-1 block text-sm font-normal text-[#667b98]">
+            Your student ID or reference number
+          </span>
+        </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Course category">
+            <select
+              value={category}
+              disabled
+              aria-readonly="true"
+              className="enroll-input bg-white disabled:opacity-100"
+            >
+              <option>{category}</option>
+            </select>
+          </Field>
+          <Field label="Learning mode">
+            <select
+              name="learningMode"
+              defaultValue="self-paced"
+              className="enroll-input bg-white"
+            >
+              <option value="self-paced">Self-paced</option>
+              <option value="instructor-led">Instructor-led</option>
+            </select>
+          </Field>
+        </div>
+        <Field label="Country">
+          <select
+            name="countryCode"
+            defaultValue="US"
+            className="enroll-input bg-white"
+          >
+            <option value="US">United States</option>
+            <option value="ET">Ethiopia</option>
+            <option value="KE">Kenya</option>
+            <option value="GB">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="NG">Nigeria</option>
+            <option value="ZA">South Africa</option>
+          </select>
+        </Field>
+        <Field label="Address line 1">
+          <input
+            name="addressLine1"
+            required
+            autoComplete="address-line1"
+            placeholder="123 Learning Lane"
+            className="enroll-input"
+          />
+        </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="City">
+            <input
+              name="city"
+              required
+              autoComplete="address-level2"
+              placeholder="San Francisco"
+              className="enroll-input"
+            />
+          </Field>
+          <Field label="Postal code (optional)">
+            <input
+              name="postalCode"
+              autoComplete="postal-code"
+              placeholder="94107"
+              className="enroll-input"
+            />
+          </Field>
+        </div>
+        <label className="flex items-center gap-3 text-base">
+          <input
+            name="saveDetails"
+            type="checkbox"
+            defaultChecked
+            className="size-5 accent-[#087af0]"
+          />
+          Save these details for faster enrollment next time
+        </label>
+      </div>
+      <button
+        disabled={state === 'saving'}
+        className="mt-5 flex w-full items-center justify-center gap-3 rounded-md bg-[#087af0] px-5 py-4 text-lg font-semibold text-white hover:bg-[#066bd1] disabled:opacity-60"
+      >
+        {state === 'saving' ? <Loader2 className="animate-spin" /> : <Users />}
+        Continue Enrollment
+      </button>
+      {state === 'saved' && (
+        <output className="mt-4 flex items-center gap-2 rounded-lg bg-[#e9f8f2] p-3 text-sm font-semibold text-[#087861]">
+          <CheckCircle2 size={18} />
+          Enrollment details saved successfully.
+        </output>
+      )}
+      {state === 'error' && (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+        >
+          {error}
+        </p>
+      )}
+      <p className="mt-6 text-sm text-[#516985]">
+        By continuing, you agree to our{' '}
+        <a className="text-[#087af0] underline" href="/terms">
+          Terms of Service
+        </a>{' '}
+        and{' '}
+        <a className="text-[#087af0] underline" href="/privacy">
+          Privacy Policy
+        </a>
+        .
+      </p>
+    </form>
+  );
+}
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block text-base font-semibold text-[#12213d]">
+      {label}
+      {children}
+    </label>
+  );
+}

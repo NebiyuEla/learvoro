@@ -20,7 +20,7 @@ export function AuthForm({ mode, returnTo = '/my-learning' }: { mode: 'login' | 
     }
     setBusy(false);
   }
-  return <form onSubmit={submit} className="mt-7 space-y-4">
+  return <form method="post" onSubmit={submit} className="mt-7 space-y-4">
     {mode === 'signup' && <label className="block font-semibold">Full name<input name="fullName" required autoComplete="name" className="enroll-input mt-2" /></label>}
     <label className="block font-semibold">Email address<input name="email" type="email" required autoComplete="email" className="enroll-input mt-2" /></label>
     <label className="block font-semibold">Password<input name="password" type="password" required minLength={10} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} className="enroll-input mt-2" /></label>

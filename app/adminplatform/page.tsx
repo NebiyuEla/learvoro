@@ -1,3 +1,143 @@
-import{env}from'@/lib/runtime';import{Logo}from'@/components/site-header';import{AdminLogin}from'@/components/admin-login';import{AdminSignout}from'@/components/admin-signout';import{isAdmin}from'@/lib/admin-auth';export const dynamic='force-dynamic';export const metadata={title:'Admin Platform',robots:{index:false,follow:false}};
-type Row={student_reference:string|null;email:string;fullName:string;country_code:string;address_line_1:string;city:string;postal_code:string|null;status:string;created_at:number;course_title:string};
-export default async function AdminPlatform(){if(!await isAdmin())return <main className="grid min-h-screen place-items-center bg-[#f4f8f7] px-5"><div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-sm"><Logo/><h1 className="mt-8 font-heading text-3xl font-bold">Admin platform</h1><p className="mt-2 text-[#5d696c]">Restricted access to Learvoro enrollment records.</p><AdminLogin/></div></main>;const db=(env as unknown as{DB:D1Database}).DB;let rows:Row[]=[];try{rows=(await db.prepare('SELECT d.student_reference,d.email,d.full_name as fullName,d.country_code,d.address_line_1,d.city,d.postal_code,d.status,d.created_at,c.title as course_title FROM checkout_drafts d JOIN courses c ON c.id=d.course_id ORDER BY d.updated_at DESC LIMIT 250').all<Row>()).results}catch{}return <div className="min-h-screen bg-[#f5f8f8]"><header className="border-b bg-white"><div className="mx-auto flex h-16 max-w-[1280px] items-center px-5"><Logo/><span className="ml-5 rounded bg-[#E7F8F3] px-2 py-1 text-xs font-bold text-[#0757B2]">ADMIN</span><div className="ml-auto"><AdminSignout/></div></div></header><main className="mx-auto max-w-[1280px] px-5 py-10"><h1 className="font-heading text-3xl font-bold">Enrollment records</h1><p className="mt-2 text-[#5d696c]">{rows.length} saved enrollment {rows.length===1?'record':'records'}</p><div className="mt-7 overflow-x-auto rounded-xl border bg-white"><table className="w-full min-w-[1000px] text-left text-sm"><thead className="bg-[#eef5f4]"><tr>{['Reference','Student','Email','Course','Location','Address','Status','Saved'].map(x=><th key={x} className="px-4 py-3 font-semibold">{x}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.student_reference??i} className="border-t"><td className="px-4 py-4 font-mono text-xs">{r.student_reference??'Pending'}</td><td className="px-4 py-4 font-semibold">{r.fullName}</td><td className="px-4 py-4">{r.email}</td><td className="px-4 py-4">{r.course_title}</td><td className="px-4 py-4">{r.city}, {r.country_code}</td><td className="px-4 py-4">{r.address_line_1}{r.postal_code?' '+r.postal_code:''}</td><td className="px-4 py-4"><span className="rounded-full bg-[#e9f8f2] px-2 py-1 text-xs font-semibold text-[#087861]">{r.status}</span></td><td className="px-4 py-4">{new Date(r.created_at*1000).toLocaleDateString()}</td></tr>)}{!rows.length&&<tr><td colSpan={8} className="px-5 py-12 text-center text-[#687477]">No enrollment records yet.</td></tr>}</tbody></table></div><p className="mt-5 text-xs text-[#687477]">Payment card numbers and security codes are never collected or displayed here.</p></main></div>}
+import { env } from '@/lib/runtime';
+import { Logo } from '@/components/site-header';
+import { AdminLogin } from '@/components/admin-login';
+import { AdminSignout } from '@/components/admin-signout';
+import { isAdmin } from '@/lib/admin-auth';
+export const dynamic = 'force-dynamic';
+export const metadata = {
+  title: 'Admin Platform',
+  robots: { index: false, follow: false },
+};
+type Row = {
+  student_reference: string | null;
+  email: string;
+  fullName: string;
+  country_code: string;
+  address_line_1: string;
+  city: string;
+  postal_code: string | null;
+  learning_mode: string;
+  save_details: boolean;
+  status: string;
+  created_at: number;
+  course_title: string;
+};
+export default async function AdminPlatform() {
+  if (!(await isAdmin()))
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f4f8f7] px-5">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-8 shadow-sm">
+          <Logo />
+          <h1 className="mt-8 font-heading text-3xl font-bold">
+            Admin platform
+          </h1>
+          <p className="mt-2 text-[#5d696c]">
+            Restricted access to Learvoro enrollment records.
+          </p>
+          <AdminLogin />
+        </div>
+      </main>
+    );
+  const db = (env as unknown as { DB: D1Database }).DB;
+  let rows: Row[] = [];
+  try {
+    rows = (
+      await db
+        .prepare(
+          'SELECT d.student_reference,d.email,d.full_name as fullName,d.country_code,d.address_line_1,d.city,d.postal_code,d.learning_mode,d.save_details,d.status,d.created_at,c.title as course_title FROM checkout_drafts d JOIN courses c ON c.id=d.course_id ORDER BY d.updated_at DESC LIMIT 250',
+        )
+        .all<Row>()
+    ).results;
+  } catch {}
+  return (
+    <div className="min-h-screen bg-[#f5f8f8]">
+      <header className="border-b bg-white">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center px-5">
+          <Logo />
+          <span className="ml-5 rounded bg-[#E7F8F3] px-2 py-1 text-xs font-bold text-[#0757B2]">
+            ADMIN
+          </span>
+          <div className="ml-auto">
+            <AdminSignout />
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-[1280px] px-5 py-10">
+        <h1 className="font-heading text-3xl font-bold">Enrollment records</h1>
+        <p className="mt-2 text-[#5d696c]">
+          {rows.length} saved enrollment{' '}
+          {rows.length === 1 ? 'record' : 'records'}
+        </p>
+        <div className="mt-7 overflow-x-auto rounded-xl border bg-white">
+          <table className="w-full min-w-[1250px] text-left text-sm">
+            <thead className="bg-[#eef5f4]">
+              <tr>
+                {[
+                  'Reference',
+                  'Student',
+                  'Email',
+                  'Course',
+                  'Learning mode',
+                  'Location',
+                  'Address',
+                  'Remember details',
+                  'Status',
+                  'Saved',
+                ].map((x) => (
+                  <th key={x} className="px-4 py-3 font-semibold">
+                    {x}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={r.student_reference ?? i} className="border-t">
+                  <td className="px-4 py-4 font-mono text-xs">
+                    {r.student_reference ?? 'Pending'}
+                  </td>
+                  <td className="px-4 py-4 font-semibold">{r.fullName}</td>
+                  <td className="px-4 py-4">{r.email}</td>
+                  <td className="px-4 py-4">{r.course_title}</td>
+                  <td className="px-4 py-4 capitalize">
+                    {r.learning_mode.replace('-', ' ')}
+                  </td>
+                  <td className="px-4 py-4">
+                    {r.city}, {r.country_code}
+                  </td>
+                  <td className="px-4 py-4">
+                    {r.address_line_1}
+                    {r.postal_code ? ' ' + r.postal_code : ''}
+                  </td>
+                  <td className="px-4 py-4">{r.save_details ? 'Yes' : 'No'}</td>
+                  <td className="px-4 py-4">
+                    <span className="rounded-full bg-[#e9f8f2] px-2 py-1 text-xs font-semibold text-[#087861]">
+                      {r.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    {new Date(r.created_at * 1000).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+              {!rows.length && (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-5 py-12 text-center text-[#687477]"
+                  >
+                    No enrollment records yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-5 text-xs text-[#687477]">
+          Payment card numbers and security codes are never collected or
+          displayed here.
+        </p>
+      </main>
+    </div>
+  );
+}
