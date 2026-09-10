@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     /^Student \d{4}$/.test(values.fullName) &&
     /^student\d{4}@example\.edu$/.test(values.email) &&
     /^\+1 555 010 \d{4}$/.test(values.phone) &&
-    ['United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Ethiopia'].includes(values.country) &&
+    values.country.length > 0 &&
     values.region.length > 0 &&
     values.city.length > 0 &&
     /^\d{3} Training Avenue$/.test(values.address) &&

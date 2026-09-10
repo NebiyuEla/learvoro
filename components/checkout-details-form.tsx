@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   BookOpenCheck,
   CheckCircle2,
+  CreditCard,
   Clock3,
   GraduationCap,
   Loader2,
@@ -26,6 +27,13 @@ type Data = {
   expiry: string;
   demoCode: string;
 };
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+const countries = Array.from({ length: 26 * 26 }, (_, index) => {
+  const code = String.fromCharCode(65 + Math.floor(index / 26), 65 + (index % 26));
+  return { code, name: regionNames.of(code) ?? code };
+})
+  .filter(({ code, name }) => name !== code)
+  .sort((a, b) => a.name.localeCompare(b.name));
 function generate(includePayment = true): Data {
   const id = String(Math.floor(1000 + Math.random() * 9000)),
     street = String(Math.floor(100 + Math.random() * 900)),
@@ -34,9 +42,9 @@ function generate(includePayment = true): Data {
     fullName: `Student ${id}`,
     email: `student${id}@example.edu`,
     phone: `+1 555 010 ${id}`,
-    country: 'United States',
-    region: 'California',
-    city: 'San Francisco',
+    country: 'Ethiopia',
+    region: 'Addis Ababa',
+    city: 'Addis Ababa',
     address: `${street} Training Avenue`,
     postalCode: `9${id}`,
     trainingNumber: includePayment ? `0000 ${group()} ${group()} ${group()}` : '',
@@ -68,7 +76,7 @@ export function HostedCheckoutDemo({
       fullName: '',
       email: '',
       phone: '',
-      country: '',
+      country: 'Ethiopia',
       region: '',
       city: '',
       address: '',
@@ -81,6 +89,7 @@ export function HostedCheckoutDemo({
     [error, setError] = useState(''),
     [captureId, setCaptureId] = useState(initialSessionId || ''),
     [decision, setDecision] = useState<'editing' | 'pending' | 'approved' | 'declined'>(initialSessionId ? 'pending' : 'editing'),
+    [showProcessing, setShowProcessing] = useState(false),
     [busy, setBusy] = useState(false);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -120,6 +129,7 @@ export function HostedCheckoutDemo({
       return;
     }
     setBusy(true);
+    setShowProcessing(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 5000));
       const response = await fetch('/api/training/capture', {
@@ -133,6 +143,7 @@ export function HostedCheckoutDemo({
       setDecision('pending');
     } catch {
       setError('The instructor training monitor is unavailable.');
+      setShowProcessing(false);
     }
     setBusy(false);
   }
@@ -156,7 +167,10 @@ export function HostedCheckoutDemo({
         const response = await fetch(`/api/training/capture?id=${encodeURIComponent(captureId)}`, { cache: 'no-store' });
         if (!response.ok) return;
         const result = (await response.json()) as { status: 'pending' | 'approved' | 'declined' };
-        if (result.status !== 'pending') setDecision(result.status);
+        if (result.status !== 'pending') {
+          setDecision(result.status);
+          setShowProcessing(false);
+        }
       } catch {}
     }, 1200);
     return () => clearInterval(timer);
@@ -282,6 +296,7 @@ export function HostedCheckoutDemo({
             <div className="mt-7">
               <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]">University demo · synthetic only</span></div>
               <div className="mt-3 rounded-xl border p-4 shadow-sm">
+                <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
                 <div className="overflow-hidden rounded-lg border">
                   <div className="relative">
                     <input
@@ -335,14 +350,7 @@ export function HostedCheckoutDemo({
                       value={data.country}
                       onChange={(e) => set('country', e.target.value)}
                     >
-                      <option value="" disabled>Select country</option>
-                      <option value="United States">United States</option>
-                      <option value="Canada">Canada</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Australia">Australia</option>
-                      <option value="Germany">Germany</option>
-                      <option value="France">France</option>
-                      <option value="Ethiopia">Ethiopia</option>
+                      {countries.map(({ code, name }) => <option key={code} value={name}>{name}</option>)}
                     </select>
                   </div>
                 </Field>
@@ -411,7 +419,7 @@ export function HostedCheckoutDemo({
           </form>
         </section>
       </div>
-      {(busy || decision === 'pending') && (
+      {showProcessing && (busy || decision === 'pending') && (
         <dialog open className="fixed inset-0 z-50 m-0 grid h-full max-h-none w-full max-w-none place-items-center border-0 bg-[#0b1728]/45 p-5 backdrop-blur-[2px]" aria-live="polite">
           <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#eef6ff] text-[#0874d4]"><Loader2 className="animate-spin" size={32} /></span>
