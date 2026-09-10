@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ActivityBeacon } from '@/components/activity-beacon';
 import { Inter, Manrope } from 'next/font/google';
 import './globals.css';
 
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${inter.variable} ${manrope.variable}`}>{children}</body></html>;
+  return <html lang="en"><body className={`${inter.variable} ${manrope.variable}`}><ActivityBeacon />{children}</body></html>;
 }

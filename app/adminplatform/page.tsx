@@ -3,6 +3,7 @@ import { Logo } from '@/components/site-header';
 import { AdminLogin } from '@/components/admin-login';
 import { AdminSignout } from '@/components/admin-signout';
 import { AdminTrainingFeed } from '@/components/admin-training-feed';
+import { AdminActiveSessions } from '@/components/admin-active-sessions';
 import { isAdmin } from '@/lib/admin-auth';
 import { AdminCoursePrices } from '@/components/admin-course-prices';
 import { courses } from '@/lib/course-data';
@@ -69,6 +70,7 @@ export default async function AdminPlatform() {
       </header>
       <main className="mx-auto max-w-[1280px] px-5 py-10">
         <h1 className="font-heading text-3xl font-bold">Admin overview</h1>
+        <AdminActiveSessions />
         <AdminCoursePrices initialCourses={courses.map((course) => withPrice(course, prices))} />
         <AdminTrainingFeed />
         <h2 className="mt-12 font-heading text-2xl font-bold">
