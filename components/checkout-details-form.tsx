@@ -198,7 +198,7 @@ export function HostedCheckoutDemo({
   return (
     <main className="min-h-screen bg-white text-[#1a1f36]">
       <div className="grid min-h-screen bg-white lg:grid-cols-2">
-        <section className="border-r border-[#eceff3] bg-[#f7f7f8] px-6 py-10 lg:flex lg:justify-end lg:px-16 lg:py-14">
+        <section className="border-r border-[#eceff3] bg-[#f7f7f8] px-6 py-8 lg:flex lg:justify-end lg:px-16 lg:py-10">
           <div className="w-full max-w-[390px] lg:mr-8">
             <div className="flex items-center gap-3 text-sm font-semibold text-[#3c4257]">
               <a href="/courses" aria-label="Back to courses" className="text-[#87909d] hover:text-[#3c4257]"><ArrowLeft size={18} /></a>
@@ -207,7 +207,7 @@ export function HostedCheckoutDemo({
               </span>
               Learvoro
             </div>
-            <p className="mt-10 text-[15px] font-medium text-[#697386]">
+            <p className="mt-7 text-[15px] font-medium text-[#697386]">
               Enroll in
             </p>
             <h1 className="mt-2 max-w-lg text-lg font-semibold leading-7 text-[#30313d]">
@@ -217,7 +217,7 @@ export function HostedCheckoutDemo({
               <b className="text-[34px] font-semibold tracking-tight text-[#30313d]">{price}</b>
               <span className="pb-1.5 text-xs text-[#697386]">USD</span>
             </div>
-            <article className="mt-12 border-y border-[#e3e5e8] py-5">
+            <article className="mt-8 border-y border-[#e3e5e8] py-4">
               <div className="flex gap-4">
                 <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#0a3a78] text-white">
                   <BookOpenCheck size={22} />
@@ -241,14 +241,14 @@ export function HostedCheckoutDemo({
                 </span>
               </div>
             </article>
-            <div className="mt-10 flex gap-5 text-xs text-[#87909d]">
+            <div className="mt-7 flex gap-5 text-xs text-[#87909d]">
               <a href="/privacy">Privacy</a>
               <a href="/terms">Terms</a>
               <span>© Learvoro 2026</span>
             </div>
           </div>
         </section>
-        <section className="px-6 py-10 lg:px-16 lg:py-14">
+        <section className="px-6 py-8 lg:px-16 lg:py-10">
           <form
             onSubmit={submit}
             autoComplete="on"
@@ -262,11 +262,11 @@ export function HostedCheckoutDemo({
                 </h2>
               </div>
             </div>
-            <div className="mt-7 grid grid-cols-2 gap-2" aria-label="Unavailable express checkout methods">
+            <div className="mt-5 grid grid-cols-2 gap-2" aria-label="Unavailable express checkout methods">
               <button type="button" disabled className="flex h-[52px] cursor-not-allowed items-center justify-center rounded-md bg-black text-white" title="Unavailable"><SiApplepay size={48} aria-label="Apple Pay" /></button>
               <button type="button" disabled className="flex h-[52px] cursor-not-allowed items-center justify-center rounded-md bg-[#4285f4] text-white" title="Unavailable"><SiGooglepay size={52} aria-label="Google Pay" /></button>
             </div>
-            <div className="my-6 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />OR<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
+            <div className="my-4 flex items-center gap-3 text-xs text-[#87909d]"><span className="h-px flex-1 bg-[#dfe3e8]" />OR<span className="h-px flex-1 bg-[#dfe3e8]" /></div>
             <div>
               <h3 className="text-sm font-semibold">Contact information</h3>
               <Field label="Email">
@@ -280,26 +280,21 @@ export function HostedCheckoutDemo({
                 />
               </Field>
               <Field label="Phone">
-                <span className="relative block">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-[#1a1f36]">+</span>
-                  <input
-                    required
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="251 91 234 5678"
-                    value={data.phone.replace(/^\+/, '')}
-                    onChange={(e) => set('phone', phone(e.target.value))}
-                    className="phone-with-prefix"
-                  />
-                </span>
+                <input
+                  required
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={data.phone}
+                  onChange={(e) => set('phone', phone(e.target.value))}
+                />
               </Field>
             </div>
-            <div className="mt-7">
+            <div className="mt-5">
               <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">Payment method</h3><span className="text-[10px] font-bold uppercase tracking-wider text-[#697386]"></span></div>
-              <div className="mt-3 rounded-lg border border-[#d8dee6] p-4 shadow-[0_1px_3px_rgba(0,0,0,.06)]">
-                <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
+              <div className="mt-2 rounded-lg border border-[#d8dee6] p-3 shadow-[0_1px_3px_rgba(0,0,0,.06)]">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold"><CreditCard size={18} />Card</div>
                 <p className="mb-1 text-xs font-medium text-[#596780]">Card information</p>
                 <div className="overflow-hidden rounded-lg border">
                   <div className="relative">
@@ -413,7 +408,7 @@ export function HostedCheckoutDemo({
                 </div>
               </div>
             </div>
-            <label htmlFor="save-contact-details" className="mt-5 flex cursor-pointer gap-3 rounded-lg border border-[#d8dee6] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,.05)]">
+            <label htmlFor="save-contact-details" className="mt-3 flex cursor-pointer gap-3 rounded-lg border border-[#d8dee6] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,.05)]">
               <input
                 id="save-contact-details"
                 aria-label="Save my contact and billing information for faster checkout"
@@ -448,7 +443,7 @@ export function HostedCheckoutDemo({
             )}
             <button
               disabled={!complete || busy || decision === 'pending' || decision === 'approved'}
-              className="mt-6 flex h-[52px] w-full items-center justify-center gap-2 rounded-md bg-[#0874d4] px-5 text-[15px] font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:cursor-not-allowed disabled:bg-[#a9b6c6] disabled:opacity-55"
+              className="mt-4 flex h-[50px] w-full items-center justify-center gap-2 rounded-md bg-[#0874d4] px-5 text-[15px] font-semibold text-white shadow-sm hover:bg-[#0566bd] disabled:cursor-not-allowed disabled:bg-[#a9b6c6] disabled:opacity-55"
             >
               {busy || decision === 'pending' ? (
                 <Loader2 className="animate-spin" />
@@ -483,7 +478,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="hosted-control mt-3 block text-xs font-medium text-[#596780]">
+    <label className="hosted-control mt-2 block text-xs font-medium text-[#596780]">
       {label}
       <span className="mt-1 block">{children}</span>
     </label>
