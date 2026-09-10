@@ -155,6 +155,25 @@ a:focus-visible {
   border-color: #087af0;
   box-shadow: 0 0 0 3px rgba(8, 122, 240, 0.12);
 }
+.hosted-field,
+.hosted-control input,
+.hosted-control select {
+  display: block;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.9rem;
+  color: #1a1f36;
+  outline: none;
+}
+.hosted-field:focus,
+.hosted-control input:focus,
+.hosted-control select:focus {
+  border-color: #0a65c7;
+  box-shadow: 0 0 0 3px rgba(10, 101, 199, 0.12);
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
