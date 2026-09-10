@@ -1,7 +1,13 @@
 'use client';
 import { useState } from 'react';
-import { CheckCircle2, CreditCard, LockKeyhole } from 'lucide-react';
-import { SiMastercard, SiVisa } from 'react-icons/si';
+import {
+  CheckCircle2,
+  CircleHelp,
+  Loader2,
+  LockKeyhole,
+  ShieldCheck,
+} from 'lucide-react';
+import { SiDiscover, SiMastercard, SiVisa } from 'react-icons/si';
 
 type TrainingData = {
   fullName: string;
@@ -16,7 +22,7 @@ type TrainingData = {
   expiry: string;
   demoCode: string;
 };
-const emptyData: TrainingData = {
+const starter: TrainingData = {
   fullName: 'Student 4821',
   email: 'student4821@example.edu',
   phone: '+1 555 010 4821',
@@ -32,7 +38,7 @@ const emptyData: TrainingData = {
 function generatedData(): TrainingData {
   const id = String(Math.floor(1000 + Math.random() * 9000));
   const street = String(Math.floor(100 + Math.random() * 900));
-  const groups = () => String(Math.floor(1000 + Math.random() * 9000));
+  const group = () => String(Math.floor(1000 + Math.random() * 9000));
   return {
     fullName: `Student ${id}`,
     email: `student${id}@example.edu`,
@@ -42,7 +48,7 @@ function generatedData(): TrainingData {
     city: 'San Francisco',
     address: `${street} Training Avenue`,
     postalCode: `9${id}`,
-    trainingNumber: `0000 ${groups()} ${groups()} ${groups()}`,
+    trainingNumber: `0000 ${group()} ${group()} ${group()}`,
     expiry: '12/30',
     demoCode: String(Math.floor(100 + Math.random() * 900)),
   };
@@ -55,7 +61,7 @@ export function CheckoutDetailsForm({
   product: string;
   price: string;
 }) {
-  const [data, setData] = useState<TrainingData>(emptyData);
+  const [data, setData] = useState(starter);
   const [captured, setCaptured] = useState<TrainingData | null>(null);
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
@@ -84,22 +90,21 @@ export function CheckoutDetailsForm({
   }
   async function submit(event: { preventDefault(): void }) {
     event.preventDefault();
-    if (
-      !/^Student \d{4}$/.test(data.fullName) ||
-      !/^student\d{4}@example\.edu$/.test(data.email) ||
-      !/^\+1 555 010 \d{4}$/.test(data.phone) ||
-      data.country !== 'United States' ||
-      data.region !== 'California' ||
-      data.city !== 'San Francisco' ||
-      !/^\d{3} Training Avenue$/.test(data.address) ||
-      !/^9\d{4}$/.test(data.postalCode) ||
-      !/^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) ||
-      data.expiry !== '12/30' ||
-      !/^\d{3}$/.test(data.demoCode)
-    ) {
-      setCaptured(null);
+    const synthetic =
+      /^Student \d{4}$/.test(data.fullName) &&
+      /^student\d{4}@example\.edu$/.test(data.email) &&
+      /^\+1 555 010 \d{4}$/.test(data.phone) &&
+      data.country === 'United States' &&
+      data.region === 'California' &&
+      data.city === 'San Francisco' &&
+      /^\d{3} Training Avenue$/.test(data.address) &&
+      /^9\d{4}$/.test(data.postalCode) &&
+      /^0000 \d{4} \d{4} \d{4}$/.test(data.trainingNumber) &&
+      data.expiry === '12/30' &&
+      /^\d{3}$/.test(data.demoCode);
+    if (!synthetic) {
       setError(
-        'Training mode: only the provided synthetic classroom identity and payment credentials can be used.',
+        'Training mode: use Generate synthetic data to create valid classroom credentials.',
       );
       return;
     }
@@ -111,200 +116,80 @@ export function CheckoutDetailsForm({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ ...data, product }),
       });
-      if (!response.ok) {
-        setError(
-          'Training mode: only the provided synthetic classroom values can be used.',
-        );
-        setSending(false);
-        return;
-      }
+      if (!response.ok) throw new Error('rejected');
       setCaptured({ ...data });
     } catch {
-      setError('The classroom monitor is unavailable. Please try again.');
+      setError(
+        'The training monitor could not receive this simulation. Please try again.',
+      );
     }
     setSending(false);
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <form
         onSubmit={submit}
         autoComplete="off"
-        className="rounded-2xl border bg-white p-5 shadow-sm sm:p-6"
+        className="rounded-xl border bg-white p-6 shadow-sm md:p-8"
       >
-        <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-heading text-3xl font-bold">Secure checkout</h1>
-            <p className="mt-2 flex items-center gap-2 text-sm text-[#657794]">
-              <LockKeyhole size={17} />
-              Local classroom simulation
+            <h1 className="font-heading text-[2rem] font-bold leading-tight">
+              Payment Details
+            </h1>
+            <p className="mt-3 flex items-center gap-2 text-[#657794]">
+              <LockKeyhole size={18} />
+              Synthetic classroom checkout
             </p>
           </div>
-          <div className="flex gap-2">
-            <Brand>
-              <SiVisa
-                className="text-[#173f82]"
-                size={35}
-                aria-label="Visa training indicator"
-              />
-            </Brand>
-            <Brand>
-              <SiMastercard
-                className="text-[#d84a3a]"
-                size={31}
-                aria-label="Mastercard training indicator"
-              />
-            </Brand>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setData(generatedData());
+              setCaptured(null);
+              setError('');
+            }}
+            className="rounded-md border border-[#8db6df] bg-[#f4f9ff] px-3 py-2 text-xs font-semibold text-[#0757B2]"
+          >
+            Generate synthetic data
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setData(generatedData());
-            setCaptured(null);
-            setError('');
-          }}
-          className="mt-4 rounded-lg border border-[#8db6df] bg-[#f4f9ff] px-4 py-2 text-sm font-semibold text-[#0757B2]"
-        >
-          Generate new synthetic data
-        </button>
-        <fieldset className="mt-7">
-          <legend className="font-heading text-xl font-bold">
-            Customer information
-          </legend>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="Full name">
+        <div className="mt-7">
+        <p className="text-sm font-bold">Training card information</p>
+          <div className="mt-2 overflow-hidden rounded-lg border border-[#cbd5e1]">
+            <div className="relative">
               <input
+                aria-label="16-digit Training Number"
                 required
-                value={data.fullName}
-                onChange={(e) => update('fullName', e.target.value)}
-                placeholder="Alex Student"
-                className="enroll-input"
+                inputMode="numeric"
+                value={data.trainingNumber}
+                onChange={(e) =>
+                  update('trainingNumber', formatNumber(e.target.value))
+                }
+                className="block w-full border-0 px-5 py-4 pr-44 text-lg outline-none"
               />
-            </Field>
-            <Field label="Email">
-              <input
-                required
-                type="email"
-                value={data.email}
-                onChange={(e) => update('email', e.target.value)}
-                placeholder="alex.student@example.edu"
-                className="enroll-input"
-              />
-            </Field>
-            <Field label="Phone number">
-              <input
-                required
-                type="tel"
-                value={data.phone}
-                onChange={(e) => update('phone', e.target.value)}
-                placeholder="+1 555 010 2026"
-                className="enroll-input"
-              />
-            </Field>
-          </div>
-        </fieldset>
-        <fieldset className="mt-6 border-t pt-5">
-          <legend className="font-heading text-xl font-bold">
-            Billing address
-          </legend>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="Country">
-              <select
-                required
-                value={data.country}
-                onChange={(e) => update('country', e.target.value)}
-                className="enroll-input bg-white"
-              >
-                <option value="">Select country</option>
-                <option>United States</option>
-                <option>Ethiopia</option>
-                <option>Kenya</option>
-                <option>United Kingdom</option>
-                <option>Canada</option>
-                <option>Nigeria</option>
-                <option>South Africa</option>
-              </select>
-            </Field>
-            <Field label="State / Region">
-              <input
-                required
-                value={data.region}
-                onChange={(e) => update('region', e.target.value)}
-                placeholder="California"
-                className="enroll-input"
-              />
-            </Field>
-            <Field label="City">
-              <input
-                required
-                value={data.city}
-                onChange={(e) => update('city', e.target.value)}
-                placeholder="San Francisco"
-                className="enroll-input"
-              />
-            </Field>
-            <Field label="Postal code">
-              <input
-                required
-                value={data.postalCode}
-                onChange={(e) => update('postalCode', e.target.value)}
-                placeholder="94107"
-                className="enroll-input"
-              />
-            </Field>
-            <Field label="Street address" wide>
-              <input
-                required
-                value={data.address}
-                onChange={(e) => update('address', e.target.value)}
-                placeholder="123 University Avenue"
-                className="enroll-input"
-              />
-            </Field>
-          </div>
-        </fieldset>
-        <fieldset className="mt-6 border-t pt-5">
-          <legend className="font-heading text-xl font-bold">
-            Payment information
-          </legend>
-          <div className="mt-3 rounded-lg border border-[#b9c6d5] bg-[#f8fbff] p-4 text-sm text-[#314966]">
-            <b>Synthetic-only format:</b> generated training numbers always
-            begin with 0000. Generate another safe example anytime.
-          </div>
-          <div className="mt-4">
-            <Field label="16-digit Training Number">
-              <div className="relative">
-                <input
-                  required
-                  inputMode="numeric"
-                  value={data.trainingNumber}
-                  onChange={(e) =>
-                    update('trainingNumber', formatNumber(e.target.value))
-                  }
-                  placeholder="1111 2222 3333 4444"
-                  className="enroll-input pr-12"
-                />
-                <CreditCard
-                  className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-[#49617d]"
-                  size={22}
-                />
+              <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                <SiVisa className="text-[#173f82]" size={31} />
+                <SiMastercard className="text-[#e24b3b]" size={27} />
+                <SiDiscover className="text-[#ed7d22]" size={29} />
               </div>
-            </Field>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <Field label="Expiry date">
+            </div>
+            <div className="grid grid-cols-2 border-t">
+              <div className="relative border-r">
                 <input
+                  aria-label="Expiry date"
                   required
                   inputMode="numeric"
                   value={data.expiry}
                   onChange={(e) =>
                     update('expiry', formatExpiry(e.target.value))
                   }
-                  placeholder="MM/YY"
-                  className="enroll-input"
+                  className="block w-full border-0 px-5 py-4 text-lg outline-none"
                 />
-              </Field>
-              <Field label="Demo Security Code">
+              </div>
+              <div className="relative">
                 <input
+                  aria-label="Demo Security Code"
                   required
                   inputMode="numeric"
                   value={data.demoCode}
@@ -314,17 +199,76 @@ export function CheckoutDetailsForm({
                       (e.target.value.match(/\d/g) ?? []).slice(0, 3).join(''),
                     )
                   }
-                  placeholder="123"
-                  className="enroll-input"
+                  className="block w-full border-0 px-5 py-4 pr-12 text-lg outline-none"
                 />
-              </Field>
+                <CircleHelp
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#526986]"
+                  size={20}
+                />
+              </div>
             </div>
           </div>
-        </fieldset>
+          <p className="mt-2 text-xs text-[#657794]">
+            Synthetic training numbers always start with 0000 and cannot be used
+            for payment.
+          </p>
+        </div>
+        <div className="mt-5">
+          <Field label="Name on training card">
+            <input
+              required
+              value={data.fullName}
+              onChange={(e) => update('fullName', e.target.value)}
+              className="checkout-field"
+            />
+          </Field>
+        </div>
+        <div className="mt-5">
+          <Field label="Billing address">
+            <select
+              value={data.country}
+              onChange={(e) => update('country', e.target.value)}
+              className="checkout-field bg-white"
+            >
+              <option>United States</option>
+            </select>
+          </Field>
+          <input
+            aria-label="Street address"
+            required
+            value={data.address}
+            onChange={(e) => update('address', e.target.value)}
+            className="checkout-field mt-3"
+          />
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <input
+              aria-label="City"
+              required
+              value={data.city}
+              onChange={(e) => update('city', e.target.value)}
+              className="checkout-field"
+            />
+            <input
+              aria-label="Postal code"
+              required
+              value={data.postalCode}
+              onChange={(e) => update('postalCode', e.target.value)}
+              className="checkout-field"
+            />
+          </div>
+        </div>
+        <label className="mt-5 flex items-center gap-3 text-sm text-[#314966]">
+          <input
+            type="checkbox"
+            defaultChecked
+            className="size-5 accent-[#087af0]"
+          />
+          Keep this synthetic example for the current page session
+        </label>
         {error && (
           <p
             role="alert"
-            className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700"
+            className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700"
           >
             {error}
           </p>
@@ -332,14 +276,13 @@ export function CheckoutDetailsForm({
         <button
           type="submit"
           disabled={sending}
-          className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#066bd1]"
+          className="mt-5 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:bg-[#066bd1] disabled:opacity-60"
         >
-          <LockKeyhole />
-          {sending ? 'Sending training data…' : `Pay securely · ${price}`}
+          {sending ? <Loader2 className="animate-spin" /> : <LockKeyhole />}
+          {sending ? 'Sending training simulation…' : `Pay ${price}`}
         </button>
-        <p className="mt-4 text-center text-xs leading-5 text-[#657794]">
-          Synthetic classroom values are sent only to the authenticated live
-          training monitor and remain in temporary server memory.
+        <p className="mt-4 text-center text-xs text-[#657794]">
+          UNIVERSITY CYBERSECURITY DEMO — SYNTHETIC DATA ONLY
         </p>
       </form>
       {captured && <CapturedPanel data={captured} product={product} />}
@@ -370,22 +313,22 @@ function CapturedPanel({
   return (
     <section
       aria-live="polite"
-      className="rounded-2xl border-2 border-[#0b9b78] bg-white p-5 shadow-sm sm:p-8"
+      className="rounded-xl border-2 border-[#0b9b78] bg-white p-6 shadow-sm"
     >
       <div className="flex gap-3">
         <CheckCircle2 className="shrink-0 text-[#0b9b78]" />
         <div>
-          <h2 className="font-heading text-2xl font-bold">
+          <h2 className="font-heading text-xl font-bold">
             Captured Form Data — Training Simulation
           </h2>
           <p className="mt-1 text-sm text-[#657794]">
-            Submitted locally for: {product}
+            Live instructor monitor updated · {product}
           </p>
         </div>
       </div>
-      <dl className="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+      <dl className="mt-5 grid gap-x-6 gap-y-2 sm:grid-cols-2">
         {rows.map(([label, value]) => (
-          <div key={label} className="border-b pb-3">
+          <div key={label} className="border-b py-2">
             <dt className="text-xs font-semibold uppercase tracking-wide text-[#657794]">
               {label}
             </dt>
@@ -393,34 +336,25 @@ function CapturedPanel({
           </div>
         ))}
       </dl>
-      <div className="mt-6 rounded-xl bg-[#fff7df] p-4 text-sm leading-6 text-[#614b10]">
-        <b>Why this matters:</b> This controlled exercise demonstrates how a
-        webpage can transmit entered information. Only the exact synthetic
-        classroom values are accepted, and they are never stored in a database.
+      <div className="mt-5 flex gap-3 rounded-lg bg-[#eafaf2] p-4 text-sm leading-6 text-[#08784f]">
+        <ShieldCheck className="shrink-0" />
+        <p>
+          Only generated synthetic classroom data is accepted. Records remain
+          temporary and are never written to the database.
+        </p>
       </div>
     </section>
-  );
-}
-function Brand({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-md border bg-white px-3 py-2 text-xs font-extrabold tracking-tight text-[#173f82]">
-      {children}
-    </span>
   );
 }
 function Field({
   label,
   children,
-  wide = false,
 }: {
   label: string;
   children: React.ReactNode;
-  wide?: boolean;
 }) {
   return (
-    <label
-      className={`block text-sm font-semibold text-[#12213d] ${wide ? 'sm:col-span-2' : ''}`}
-    >
+    <label className="block text-sm font-bold text-[#12213d]">
       {label}
       {children}
     </label>

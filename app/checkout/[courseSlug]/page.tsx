@@ -1,8 +1,11 @@
+/* oxlint-disable next/no-html-link-for-pages */
 import { redirect } from 'next/navigation';
 import {
   BookOpenCheck,
+  CreditCard,
+  Globe2,
+  HelpCircle,
   LockKeyhole,
-  MonitorCheck,
   ShieldCheck,
 } from 'lucide-react';
 import { Logo } from '@/components/site-header';
@@ -28,7 +31,7 @@ export default async function CheckoutDemo({
         UNIVERSITY CYBERSECURITY DEMO — SYNTHETIC DATA ONLY
       </div>
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-[1380px] items-center px-5 py-3 lg:px-10">
+        <div className="mx-auto flex max-w-[1180px] items-center px-5 py-4 lg:px-6">
           <Logo />
           <div className="ml-auto flex items-center gap-3">
             <LockKeyhole className="text-[#0757B2]" size={28} />
@@ -41,24 +44,42 @@ export default async function CheckoutDemo({
           </div>
         </div>
       </header>
-      <main className="mx-auto grid max-w-[1380px] gap-7 px-4 py-4 md:px-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,.75fr)] lg:px-10">
+      <div className="mx-auto max-w-[1180px] px-5 py-5 lg:px-6">
+        <div className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-start gap-3 text-center text-sm text-[#566983]">
+          <Step number="1" label="Payment" active />
+          <span className="mt-5 h-px bg-[#cfd7e2]" />
+          <Step number="2" label="Review" />
+          <span className="mt-5 h-px bg-[#cfd7e2]" />
+          <Step number="3" label="Complete" />
+        </div>
+      </div>
+      <main className="mx-auto grid max-w-[1180px] gap-7 px-5 pb-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,.95fr)] lg:px-6">
         <CheckoutDetailsForm product={course.title} price={price} />
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
-          <section className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h2 className="font-heading text-2xl font-bold">Order summary</h2>
+          <section className="rounded-xl border bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="font-heading text-2xl font-bold">Order Summary</h2>
+              <a
+                href="/courses"
+                className="text-sm font-semibold text-[#087af0]"
+              >
+                Edit
+              </a>
+            </div>
             <div className="mt-6 flex gap-4 border-b pb-6">
               <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-[#082b5d] text-white">
                 <BookOpenCheck size={30} />
               </span>
-              <div>
+              <div className="min-w-0">
                 <b className="block leading-5">{course.title}</b>
                 <span className="mt-1 block text-sm text-[#657794]">
                   Cybersecurity classroom demonstration
                 </span>
               </div>
+              <b className="ml-auto whitespace-nowrap">{price}</b>
             </div>
             <dl className="mt-5 space-y-3">
-              <Summary label="Course" value={price} />
+              <Summary label="Subtotal" value={price} />
               <Summary label="Processing fee" value="$0.00" />
               <div className="flex justify-between border-t pt-5 text-xl font-bold">
                 <dt>Total</dt>
@@ -66,35 +87,79 @@ export default async function CheckoutDemo({
               </div>
             </dl>
           </section>
-          <section className="rounded-2xl border bg-white p-6">
+          <section className="rounded-xl bg-[#eafaf2] p-6 text-[#08784f]">
             <div className="flex gap-4">
               <ShieldCheck className="shrink-0 text-[#0b9b78]" size={36} />
               <div>
                 <h3 className="font-heading text-lg font-bold">
-                  Safe by design
+                  Your training session is secure
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-[#657794]">
-                  Only the displayed synthetic credentials are accepted.
-                  Training submissions are held temporarily in server memory for
-                  the instructor monitor.
+                <p className="mt-2 text-sm leading-6 text-[#28715e]">
+                  Generated synthetic credentials are isolated from real payment
+                  systems and shown only in the instructor monitor.
                 </p>
               </div>
             </div>
           </section>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            <Feature
-              icon={<MonitorCheck />}
-              title="Local simulation"
-              copy="Authenticated instructor feed"
-            />
+          <div className="grid grid-cols-2 gap-3">
             <Feature
               icon={<LockKeyhole />}
-              title="Temporary data"
-              copy="Refresh to erase"
+              title="Isolated Demo"
+              copy="Synthetic data only"
             />
+            <Feature
+              icon={<ShieldCheck />}
+              title="Instructor View"
+              copy="Authenticated monitor"
+            />
+            <Feature
+              icon={<CreditCard />}
+              title="Training Cards"
+              copy="Always begin with 0000"
+            />
+            <Feature
+              icon={<Globe2 />}
+              title="Classroom Ready"
+              copy="Desktop and mobile"
+            />
+          </div>
+          <div className="flex items-center gap-4 px-3 py-2">
+            <span className="grid size-10 place-items-center rounded-full bg-[#e9eef4]">
+              <HelpCircle size={20} />
+            </span>
+            <p className="text-sm">
+              Need help?
+              <br />
+              <a
+                href="/help"
+                className="font-semibold text-[#087af0] underline"
+              >
+                Contact support
+              </a>
+            </p>
           </div>
         </aside>
       </main>
+    </div>
+  );
+}
+function Step({
+  number,
+  label,
+  active = false,
+}: {
+  number: string;
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <div>
+      <span
+        className={`mx-auto grid size-10 place-items-center rounded-full font-bold ${active ? 'bg-[#087af0] text-white' : 'bg-[#e9eef4]'}`}
+      >
+        {number}
+      </span>
+      <b className={`mt-2 block ${active ? 'text-[#087af0]' : ''}`}>{label}</b>
     </div>
   );
 }
