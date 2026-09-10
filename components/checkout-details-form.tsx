@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { CheckCircle2, CreditCard, LockKeyhole } from 'lucide-react';
+import { SiMastercard, SiVisa } from 'react-icons/si';
 
 type TrainingData = {
   fullName: string;
@@ -39,6 +40,7 @@ export function CheckoutDetailsForm({
   const [data, setData] = useState<TrainingData>(emptyData);
   const [captured, setCaptured] = useState<TrainingData | null>(null);
   const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
   function update<K extends keyof TrainingData>(
     key: K,
     value: TrainingData[K],
@@ -62,21 +64,47 @@ export function CheckoutDetailsForm({
       ? `${digits.slice(0, 2)}/${digits.slice(2)}`
       : digits;
   }
-  function submit(event: { preventDefault(): void }) {
+  async function submit(event: { preventDefault(): void }) {
     event.preventDefault();
     if (
+      data.fullName !== 'Alex Student' ||
+      data.email !== 'alex.student@example.edu' ||
+      data.phone !== '+1 555 010 2026' ||
+      data.country !== 'United States' ||
+      data.region !== 'California' ||
+      data.city !== 'San Francisco' ||
+      data.address !== '123 University Avenue' ||
+      data.postalCode !== '94107' ||
       data.trainingNumber !== '1111 2222 3333 4444' ||
       data.expiry !== '12/30' ||
       data.demoCode !== '123'
     ) {
       setCaptured(null);
       setError(
-        'Training mode: only the provided synthetic payment credentials can be used.',
+        'Training mode: only the provided synthetic classroom identity and payment credentials can be used.',
       );
       return;
     }
+    setSending(true);
     setError('');
-    setCaptured({ ...data });
+    try {
+      const response = await fetch('/api/training/capture', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ...data, product }),
+      });
+      if (!response.ok) {
+        setError(
+          'Training mode: only the provided synthetic classroom values can be used.',
+        );
+        setSending(false);
+        return;
+      }
+      setCaptured({ ...data });
+    } catch {
+      setError('The classroom monitor is unavailable. Please try again.');
+    }
+    setSending(false);
   }
   return (
     <div className="space-y-6">
@@ -94,8 +122,15 @@ export function CheckoutDetailsForm({
             </p>
           </div>
           <div className="flex gap-2">
-            <Brand>VISA</Brand>
-            <Brand>Mastercard</Brand>
+            <Brand>
+              <SiVisa size={35} aria-label="Visa training indicator" />
+            </Brand>
+            <Brand>
+              <SiMastercard
+                size={31}
+                aria-label="Mastercard training indicator"
+              />
+            </Brand>
           </div>
         </div>
         <fieldset className="mt-7">
@@ -161,7 +196,7 @@ export function CheckoutDetailsForm({
                 required
                 value={data.region}
                 onChange={(e) => update('region', e.target.value)}
-                placeholder="State or region"
+                placeholder="California"
                 className="enroll-input"
               />
             </Field>
@@ -170,7 +205,7 @@ export function CheckoutDetailsForm({
                 required
                 value={data.city}
                 onChange={(e) => update('city', e.target.value)}
-                placeholder="City"
+                placeholder="San Francisco"
                 className="enroll-input"
               />
             </Field>
@@ -179,7 +214,7 @@ export function CheckoutDetailsForm({
                 required
                 value={data.postalCode}
                 onChange={(e) => update('postalCode', e.target.value)}
-                placeholder="Postal code"
+                placeholder="94107"
                 className="enroll-input"
               />
             </Field>
@@ -261,14 +296,15 @@ export function CheckoutDetailsForm({
         )}
         <button
           type="submit"
+          disabled={sending}
           className="mt-6 flex w-full items-center justify-center gap-3 rounded-lg bg-[#087af0] px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#066bd1]"
         >
           <LockKeyhole />
-          Pay securely · {price}
+          {sending ? 'Sending training data…' : `Pay securely · ${price}`}
         </button>
         <p className="mt-4 text-center text-xs leading-5 text-[#657794]">
-          Training simulation only. No information leaves this browser tab, and
-          everything disappears when the page refreshes.
+          Synthetic classroom values are sent only to the authenticated live
+          training monitor and remain in temporary server memory.
         </p>
       </form>
       {captured && <CapturedPanel data={captured} product={product} />}
@@ -323,9 +359,9 @@ function CapturedPanel({
         ))}
       </dl>
       <div className="mt-6 rounded-xl bg-[#fff7df] p-4 text-sm leading-6 text-[#614b10]">
-        <b>Why this matters:</b> In a real phishing attack, a malicious website
-        could transmit captured information elsewhere. This training application
-        intentionally does NOT implement that capability.
+        <b>Why this matters:</b> This controlled exercise demonstrates how a
+        webpage can transmit entered information. Only the exact synthetic
+        classroom values are accepted, and they are never stored in a database.
       </div>
     </section>
   );

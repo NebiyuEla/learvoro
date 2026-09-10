@@ -74,9 +74,9 @@ export default async function CheckoutDemo({
                   Safe by design
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-[#657794]">
-                  Only the displayed classroom credentials are accepted.
-                  Submission is processed entirely inside temporary component
-                  state.
+                  Only the displayed synthetic credentials are accepted.
+                  Training submissions are held temporarily in server memory for
+                  the instructor monitor.
                 </p>
               </div>
             </div>
@@ -85,7 +85,7 @@ export default async function CheckoutDemo({
             <Feature
               icon={<MonitorCheck />}
               title="Local simulation"
-              copy="No network requests"
+              copy="Authenticated instructor feed"
             />
             <Feature
               icon={<LockKeyhole />}
