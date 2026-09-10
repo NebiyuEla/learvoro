@@ -59,9 +59,8 @@ export async function POST(request: Request) {
     status: 'pending',
     product: course.title,
     ...values,
-    trainingNumber:
-    trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
-    demoCode: values.demoCode,
+    trainingNumber: trainingDigits ? `•••• ${trainingDigits.slice(-4)}` : '',
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id: capture.id, status: capture.status });
@@ -97,9 +96,9 @@ export async function PUT(request: Request) {
     city: clean(body.city, 60),
     address: clean(body.address, 120),
     postalCode: clean(body.postalCode, 20),
-    trainingNumber: trainingDigits.match(/.{1,4}/g)?.join(' ') ?? '',
+    trainingNumber: trainingDigits ? `•••• ${trainingDigits.slice(-4)}` : '',
     expiry: clean(body.expiry, 5),
-    demoCode: clean(body.demoCode, 100),
+    demoCode: '',
   };
   addTrainingCapture(capture);
   return Response.json({ accepted: true, id });

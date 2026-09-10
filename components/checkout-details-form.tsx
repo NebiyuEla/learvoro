@@ -1,7 +1,7 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages */
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -36,6 +36,14 @@ const countries = Array.from({ length: 26 * 26 }, (_, index) => {
 })
   .filter(({ code, name }) => name !== code)
   .sort((a, b) => a.name.localeCompare(b.name));
+const countryNameFromDevice = () => {
+  try {
+    const region = new Intl.Locale(navigator.language).maximize().region;
+    return region ? regionNames.of(region) : undefined;
+  } catch {
+    return undefined;
+  }
+};
 export function HostedCheckoutDemo({
   product,
   courseSlug,
@@ -75,6 +83,7 @@ export function HostedCheckoutDemo({
     [showProcessing, setShowProcessing] = useState(false),
     [saveContact, setSaveContact] = useState(false),
     [busy, setBusy] = useState(false);
+  const liveRequest = useRef<AbortController | null>(null);
   const set = <K extends keyof Data>(key: K, value: Data[K]) => {
     setData((current) => ({ ...current, [key]: value }));
     setError('');
@@ -134,17 +143,37 @@ export function HostedCheckoutDemo({
     setBusy(false);
   }
   useEffect(() => {
+    const detectedCountry = countryNameFromDevice();
+    if (!detectedCountry || !countries.some(({ name }) => name === detectedCountry)) return;
+    const timer = window.setTimeout(
+      () => setData((current) => ({ ...current, country: detectedCountry })),
+      0,
+    );
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
     const url = new URL(window.location.href);
     url.searchParams.set('session', liveId);
     window.history.replaceState({}, '', url);
   }, [liveId]);
   useEffect(() => {
     if (decision !== 'editing') return;
-    void fetch('/api/training/capture', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...data, product, courseSlug, captureId: liveId }),
-    });
+    const timer = window.setTimeout(() => {
+      liveRequest.current?.abort();
+      const controller = new AbortController();
+      liveRequest.current = controller;
+      const { fullName, email, phone, country, region, city, address, postalCode } = data;
+      void fetch('/api/training/capture', {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({ fullName, email, phone, country, region, city, address, postalCode, product, courseSlug, captureId: liveId }),
+      }).catch(() => undefined);
+    }, 80);
+    return () => {
+      window.clearTimeout(timer);
+      liveRequest.current?.abort();
+    };
   }, [courseSlug, data, decision, liveId, product]);
   useEffect(() => {
     if (!captureId || decision !== 'pending') return;
@@ -262,7 +291,7 @@ export function HostedCheckoutDemo({
                     placeholder="251 91 234 5678"
                     value={data.phone.replace(/^\+/, '')}
                     onChange={(e) => set('phone', phone(e.target.value))}
-                    className="pl-7"
+                    className="phone-with-prefix"
                   />
                 </span>
               </Field>
