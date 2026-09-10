@@ -1,14 +1,19 @@
 /* oxlint-disable next/no-html-link-for-pages, jsx-a11y/control-has-associated-label */
 import {
+  Award,
   ArrowRight,
   Bot,
   BriefcaseBusiness,
   Code2,
+  BookOpenCheck,
+  CircleUserRound,
   Palette,
   Play,
   Sparkles,
+  ShieldCheck,
   Zap,
 } from 'lucide-react';
+import Image from 'next/image';
 import { Logo } from '@/components/site-header';
 import { getChatGPTUser, chatGPTSignOutPath } from '@/app/chatgpt-auth';
 
@@ -41,7 +46,8 @@ export default async function Home() {
           <div className="ml-auto flex items-center gap-2.5">
             {user ? (
               <>
-                <span className="hidden text-sm text-[#526063] lg:block">
+                <span className="hidden items-center gap-2 text-sm text-[#526063] lg:flex">
+                  <CircleUserRound size={20} className="text-[#0757B2]" />
                   Welcome, <b className="text-[#162326]">{user.displayName}</b>
                 </span>
                 <a
@@ -145,6 +151,23 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        <section className="border-b bg-[#073D86] text-white">
+          <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-px bg-white/15 px-5 sm:grid-cols-4 lg:px-10">
+            {[
+              ['3', 'Focused courses'],
+              ['19', 'Practical lessons'],
+              ['6', 'Skill categories'],
+              ['Lifetime', 'Course access'],
+            ].map(([value, label]) => (
+              <div key={label} className="px-5 py-8 text-center">
+                <b className="font-heading text-3xl">{value}</b>
+                <span className="mt-1 block text-sm text-white/70">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
         <section
           id="categories"
           className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10"
@@ -168,6 +191,52 @@ export default async function Home() {
                 <ArrowRight className="ml-auto text-[#9aa6a8]" size={17} />
               </a>
             ))}
+          </div>
+        </section>
+        <section className="border-y bg-white">
+          <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-10">
+            <div className="overflow-hidden rounded-2xl border shadow-[0_18px_50px_rgba(7,61,134,.14)]">
+              <Image
+                src="/learvoro-learning-studio.png"
+                alt="A modern digital learning workspace"
+                width={1944}
+                height={840}
+                className="aspect-[16/9] h-full w-full object-cover"
+              />
+            </div>
+            <div>
+              <p className="section-kicker">A complete learning workspace</p>
+              <h2 className="section-title">
+                Everything stays connected from lesson one to completion.
+              </h2>
+              <p className="mt-5 max-w-xl text-lg leading-8 text-[#5d696c]">
+                Move from clear written guidance to practical project work,
+                track progress, and return to every course from one personal
+                dashboard.
+              </p>
+              <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                <Benefit
+                  icon={BookOpenCheck}
+                  title="Practical lessons"
+                  copy="Short steps with a concrete outcome"
+                />
+                <Benefit
+                  icon={Award}
+                  title="Completion records"
+                  copy="Progress saved to your account"
+                />
+                <Benefit
+                  icon={ShieldCheck}
+                  title="Private account"
+                  copy="Secure sessions and protected access"
+                />
+                <Benefit
+                  icon={Sparkles}
+                  title="Useful projects"
+                  copy="Build work you can share"
+                />
+              </div>
+            </div>
           </div>
         </section>
         <section className="border-y bg-white">
@@ -254,6 +323,77 @@ export default async function Home() {
             ))}
           </div>
         </section>
+        <section className="border-y bg-white">
+          <div className="mx-auto max-w-[1440px] px-5 py-16 lg:px-10">
+            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+              <div>
+                <p className="section-kicker">Verified course feedback</p>
+                <h2 className="section-title">
+                  Reviews tied to real course progress
+                </h2>
+              </div>
+              <p className="max-w-xl text-[#5d696c]">
+                Learvoro will show reviews only from enrolled learners. New
+                ratings will appear here after students complete enough of a
+                course to give useful feedback.
+              </p>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <ReviewMeasure
+                title="Clear instruction"
+                copy="Did each lesson explain the goal and the next action clearly?"
+              />
+              <ReviewMeasure
+                title="Practical output"
+                copy="Did the course finish with useful work the learner could keep?"
+              />
+              <ReviewMeasure
+                title="Appropriate pace"
+                copy="Was the course focused, well structured and easy to continue?"
+              />
+            </div>
+          </div>
+        </section>
+        <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-16 lg:grid-cols-[.7fr_1.3fr] lg:px-10">
+          <div>
+            <p className="section-kicker">Questions, answered</p>
+            <h2 className="section-title">
+              Know what to expect before you enroll.
+            </h2>
+            <p className="mt-4 text-[#5d696c]">
+              Every course page includes the full curriculum, duration,
+              requirements and access details.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-xl border bg-white">
+            {[
+              [
+                'Can I preview a course?',
+                'Yes. Each course includes a free opening lesson so you can check the teaching style before enrolling.',
+              ],
+              [
+                'How long do I keep access?',
+                'Published courses include lifetime access through your Learvoro account.',
+              ],
+              [
+                'Where is my progress saved?',
+                'Completed lessons and course access are attached to your signed-in account.',
+              ],
+              [
+                'Will reviews be verified?',
+                'Yes. Review submission will be limited to enrolled learners and connected to course progress.',
+              ],
+            ].map(([q, a]) => (
+              <details key={q} className="group border-b last:border-0">
+                <summary className="cursor-pointer list-none px-6 py-5 font-heading font-bold">
+                  {q}
+                  <span className="float-right text-[#0870C9]">+</span>
+                </summary>
+                <p className="px-6 pb-5 leading-7 text-[#5d696c]">{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
       </main>
       <footer className="border-t bg-[#f1f6f5]">
         <div className="mx-auto max-w-[1440px] px-5 py-10 lg:px-10">
@@ -271,5 +411,42 @@ export default async function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function Benefit({
+  icon: Icon,
+  title,
+  copy,
+}: {
+  icon: React.ComponentType<{ size?: number }>;
+  title: string;
+  copy: string;
+}) {
+  return (
+    <div className="flex gap-3 rounded-xl border bg-white p-4">
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#E7F8F3] text-[#0D8F7B]">
+        <Icon size={20} />
+      </span>
+      <div>
+        <b className="font-heading">{title}</b>
+        <p className="mt-1 text-sm leading-5 text-[#687477]">{copy}</p>
+      </div>
+    </div>
+  );
+}
+function ReviewMeasure({ title, copy }: { title: string; copy: string }) {
+  return (
+    <article className="rounded-xl border bg-[#f8fafa] p-6">
+      <div
+        className="flex items-center gap-1 text-[#f2a900]"
+        aria-label="Five review criteria"
+      >
+        <Award size={18} />
+        <b className="ml-2 text-[#162326]">Review criterion</b>
+      </div>
+      <h3 className="mt-5 font-heading text-xl font-bold">{title}</h3>
+      <p className="mt-3 leading-7 text-[#5d696c]">{copy}</p>
+    </article>
   );
 }

@@ -1,5 +1,6 @@
 /* oxlint-disable next/no-html-link-for-pages */
 import Image from 'next/image';
+import { CircleUserRound } from 'lucide-react';
 import { getChatGPTUser, chatGPTSignOutPath } from '@/app/chatgpt-auth';
 
 export function Logo() {
@@ -32,7 +33,8 @@ export async function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           {user ? (
             <>
-              <span className="hidden text-sm text-[#526063] lg:inline">
+              <span className="hidden items-center gap-2 text-sm text-[#526063] lg:flex">
+                <CircleUserRound size={20} className="text-[#0757B2]" />
                 Welcome, <b className="text-[#162326]">{user.displayName}</b>
               </span>
               <a
