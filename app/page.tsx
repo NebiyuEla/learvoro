@@ -118,8 +118,9 @@ export default async function Home() {
               </div>
             </div>
             <div className="overflow-hidden rounded-xl border border-[#d9e1e1] bg-white shadow-[0_22px_60px_rgba(0,64,80,.12)]">
-              <div className="relative aspect-[16/9] bg-[#073D86] p-7 text-white">
-                <div className="absolute inset-0 course-grid opacity-30" />
+              <div className="relative aspect-[16/9] overflow-hidden p-7 text-white">
+                <Image src={courseCover('professional-portfolio-website')} alt="Professional portfolio course" fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#061b3a]/85 via-[#061b3a]/20 to-[#061b3a]/15" />
                 <div className="relative flex h-full flex-col justify-between">
                   <span className="w-fit rounded-md bg-white/10 px-2.5 py-1 text-xs">
                     Lesson 10 of 17
@@ -266,7 +267,9 @@ export default async function Home() {
               href="/course/professional-portfolio-website"
               className="mt-8 grid overflow-hidden rounded-xl border md:grid-cols-[.8fr_1.2fr]"
             >
-              <div className="portfolio-art relative min-h-[260px] p-8 text-white">
+              <div className="relative min-h-[300px] overflow-hidden p-8 text-white">
+                <Image src={courseCover('professional-portfolio-website')} alt="Professional portfolio course" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#061b3a]/90 via-[#061b3a]/20 to-[#061b3a]/10" />
                 <div className="absolute left-8 top-8 rounded-md border border-white/25 px-2.5 py-1 text-xs">
                   Development · Beginner
                 </div>
