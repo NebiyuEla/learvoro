@@ -8,7 +8,7 @@ import { isAdmin } from '@/lib/admin-auth';
 import { AdminCoursePrices } from '@/components/admin-course-prices';
 import { AdminEnrollments } from '@/components/admin-enrollments';
 import { courses } from '@/lib/course-data';
-import { coursePrices, withPrice } from '@/lib/course-pricing';
+import { courseEnrollmentCounts, coursePrices, withPrice } from '@/lib/course-pricing';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Admin Platform',
@@ -46,6 +46,7 @@ export default async function AdminPlatform() {
     );
   const db = (env as unknown as { DB: D1Database }).DB;
   const prices = await coursePrices();
+  const enrollmentCounts = await courseEnrollmentCounts();
   let rows: Row[] = [];
   try {
     rows = (
@@ -72,7 +73,7 @@ export default async function AdminPlatform() {
       <main className="mx-auto max-w-[1280px] px-5 py-10">
         <h1 className="font-heading text-3xl font-bold">Admin overview</h1>
         <AdminActiveSessions />
-        <AdminCoursePrices initialCourses={courses.map((course) => withPrice(course, prices))} />
+        <AdminCoursePrices initialCourses={courses.map((course) => ({ ...withPrice(course, prices), platformEnrollments: enrollmentCounts[course.id]?.platform ?? 0, externalEnrollments: enrollmentCounts[course.id]?.external ?? 0 }))} />
         <AdminEnrollments />
         <AdminTrainingFeed />
         <h2 className="mt-12 font-heading text-2xl font-bold">

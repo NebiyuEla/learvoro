@@ -17,8 +17,7 @@ import Image from 'next/image';
 import { Logo } from '@/components/site-header';
 import { getChatGPTUser, chatGPTSignOutPath } from '@/app/chatgpt-auth';
 import { courseCover, courses, formatPrice } from '@/lib/course-data';
-import { coursePrices, withPrice } from '@/lib/course-pricing';
-import { query } from '@/lib/db';
+import { courseEnrollmentCounts, coursePrices, withPrice } from '@/lib/course-pricing';
 
 const categories = [
   { name: 'AI & Automation', icon: Bot, copy: 'Practical workflows' },
@@ -31,9 +30,9 @@ const categories = [
 export default async function Home() {
   const user = await getChatGPTUser();
   const prices = await coursePrices();
+  const enrollmentCounts = await courseEnrollmentCounts();
   const currentCourses = courses.map((course) => withPrice(course, prices));
-  let registeredLearners = 0;
-  try { registeredLearners = Number((await query<{ count:string }>('SELECT COUNT(*)::text AS count FROM users')).rows[0]?.count || 0); } catch {}
+  const totalEnrollments = Object.values(enrollmentCounts).reduce((sum, item) => sum + item.total, 0);
   return (
     <div className="home-motion min-h-screen bg-[#f8fafa] text-[#162326]">
       <header className="sticky top-0 z-40 border-b border-[#e4e9e9] bg-white/95 backdrop-blur">
@@ -164,7 +163,7 @@ export default async function Home() {
               [String(currentCourses.length), 'Focused courses'],
               [String(currentCourses.reduce((total, course) => total + course.sections.reduce((sum, section) => sum + section.lessons.length, 0), 0)), 'Practical lessons'],
               ['6', 'Skill categories'],
-              [registeredLearners.toLocaleString(), 'Registered learners'],
+              [(totalEnrollments >= 1000 ? '1,000+' : totalEnrollments.toLocaleString()), 'Course enrollments'],
             ].map(([value, label]) => (
               <div key={label} className="px-5 py-8 text-center">
                 <b className="font-heading text-3xl">{value}</b>
@@ -182,7 +181,7 @@ export default async function Home() {
               <a href="/courses" className="inline-flex items-center gap-2 font-semibold text-[#0757B2]">View all {currentCourses.length} courses <ArrowRight size={17}/></a>
             </div>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {currentCourses.slice(3,9).map((course)=><a key={course.id} href={`/course/${course.slug}`} className="group overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-lg"><div className="relative h-32 overflow-hidden"><Image src={courseCover(course.slug)} alt="" fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-500 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-[#061b3a]/80 to-transparent"/><span className="absolute left-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[#073D86]">Popular · {course.category}</span><h3 className="absolute bottom-4 left-5 font-heading text-lg font-bold text-white">{course.shortTitle}</h3></div><div className="p-5"><p className="line-clamp-2 min-h-12 text-sm leading-6 text-[#5d696c]">{course.description}</p><div className="mt-4 flex items-center justify-between border-t pt-4 text-sm"><span>{course.sections.reduce((sum,section)=>sum+section.lessons.length,0)} lessons</span><b>{formatPrice(course)}</b></div></div></a>)}
+              {currentCourses.slice(3,9).map((course)=><a key={course.id} href={`/course/${course.slug}`} className="group overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-lg"><div className="relative h-32 overflow-hidden"><Image src={courseCover(course.slug)} alt="" fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-500 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-[#061b3a]/80 to-transparent"/><span className="absolute left-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[#073D86]">Popular · {course.category}</span><h3 className="absolute bottom-4 left-5 font-heading text-lg font-bold text-white">{course.shortTitle}</h3></div><div className="p-5"><p className="line-clamp-2 min-h-12 text-sm leading-6 text-[#5d696c]">{course.description}</p><div className="mt-4 flex items-center justify-between border-t pt-4 text-sm"><span>{(enrollmentCounts[course.id]?.total ?? 0).toLocaleString()} enrolled</span><b>{formatPrice(course)}</b></div></div></a>)}
             </div>
           </div>
         </section>

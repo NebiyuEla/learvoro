@@ -22,3 +22,21 @@ export async function coursePrices(): Promise<Record<string, number>> {
 export function withPrice(course: Course, prices: Record<string, number>): Course {
   return { ...course, price: prices[course.id] ?? course.price };
 }
+
+export type CourseEnrollmentCount = { platform: number; external: number; total: number };
+export async function courseEnrollmentCounts(): Promise<Record<string, CourseEnrollmentCount>> {
+  try {
+    const result = await query<{ id: string; external: number; platform: string }>(
+      `SELECT c.id,c.external_enrollments AS external,COUNT(DISTINCT e.user_id)::text AS platform
+       FROM courses c LEFT JOIN entitlements e ON e.course_id=c.id AND e.status='active'
+       WHERE c.status='published' GROUP BY c.id,c.external_enrollments`,
+    );
+    return Object.fromEntries(result.rows.map((row) => {
+      const platform = Number(row.platform) || 0;
+      const external = Number(row.external) || 0;
+      return [row.id, { platform, external, total: platform + external }];
+    }));
+  } catch {
+    return {};
+  }
+}
