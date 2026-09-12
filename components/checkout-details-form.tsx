@@ -511,7 +511,7 @@ return () => {
             )}
             {decision === 'declined' && (
               <div className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-                <b>Enrollment was declined.</b> No course access was added. You can update the training details and try again.
+                <b>Enrollment was declined.</b> Transaction Failed: The card provided has been declined. Please try another payment method or contact your issuing bank for details.
               </div>
             )}
             <button
