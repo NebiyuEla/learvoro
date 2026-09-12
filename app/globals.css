@@ -102,6 +102,9 @@ a:focus-visible {
     linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+.course-cover {
+  background: linear-gradient(135deg, #073d86, #176aa8 58%, #18a88d);
+}
 .portfolio-art,
 .course-cover-1 {
   background: linear-gradient(135deg, #063f8f 0%, #0a73c4 65%, #15ae91 100%);

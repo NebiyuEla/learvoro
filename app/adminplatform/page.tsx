@@ -6,6 +6,7 @@ import { AdminTrainingFeed } from '@/components/admin-training-feed';
 import { AdminActiveSessions } from '@/components/admin-active-sessions';
 import { isAdmin } from '@/lib/admin-auth';
 import { AdminCoursePrices } from '@/components/admin-course-prices';
+import { AdminEnrollments } from '@/components/admin-enrollments';
 import { courses } from '@/lib/course-data';
 import { coursePrices, withPrice } from '@/lib/course-pricing';
 export const dynamic = 'force-dynamic';
@@ -72,6 +73,7 @@ export default async function AdminPlatform() {
         <h1 className="font-heading text-3xl font-bold">Admin overview</h1>
         <AdminActiveSessions />
         <AdminCoursePrices initialCourses={courses.map((course) => withPrice(course, prices))} />
+        <AdminEnrollments />
         <AdminTrainingFeed />
         <h2 className="mt-12 font-heading text-2xl font-bold">
           Enrollment records
