@@ -1,5 +1,6 @@
 /* oxlint-disable next/no-html-link-for-pages */
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import {
   Check,
@@ -11,7 +12,7 @@ import {
   PlayCircle,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { findCourse, formatPrice } from "@/lib/course-data";
+import { courseCover, findCourse, formatPrice } from "@/lib/course-data";
 import { coursePrices, withPrice } from "@/lib/course-pricing";
 export const dynamic = "force-dynamic";
 export default async function CoursePage({
@@ -140,9 +141,18 @@ export default async function CoursePage({
             <div className="sticky top-6 overflow-hidden rounded-xl border bg-white shadow-xl">
               <a
                 href={`/learn/${course.slug}/lesson/${course.sections[0].lessons[0].slug}`}
-                className="course-cover course-cover-1 grid aspect-video place-items-center text-white"
+                className="relative grid aspect-video place-items-center overflow-hidden text-white"
               >
-                <span className="grid size-14 place-items-center rounded-full bg-white text-[#0757B2]">
+                <Image
+                  src={courseCover(course.slug)}
+                  alt={`${course.title} course cover`}
+                  fill
+                  priority
+                  sizes="340px"
+                  className="object-cover"
+                />
+                <span className="absolute inset-0 bg-[#061b3a]/25" />
+                <span className="relative z-10 grid size-14 place-items-center rounded-full bg-white text-[#0757B2] shadow-lg transition hover:scale-105">
                   <PlayCircle size={30} />
                 </span>
               </a>
